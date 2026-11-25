@@ -34,13 +34,10 @@
         <a href="/cars" class="<%= current.indexOf('/car') === 0 ? 'active' : '' %>"><%= t.cars %></a>
         <a href="/news" class="<%= current === '/news' ? 'active' : '' %>"><%= t.news %></a>
         <a href="/contact" class="<%= current === '/contact' ? 'active' : '' %>"><%= t.contact %></a>
-        <details class="lang">
-          <summary aria-label="<%= t.language %>"><%= lang === 'en' ? 'EN' : 'GEO' %></summary>
-          <div>
-            <a href="/language?lang=ka" class="<%= lang === 'ka' ? 'active' : '' %>">GEO</a>
-            <a href="/language?lang=en" class="<%= lang === 'en' ? 'active' : '' %>">EN</a>
-          </div>
-        </details>
+        <div class="lang" role="group" aria-label="<%= t.language %>">
+          <a href="/language?lang=ka" class="<%= lang === 'ka' ? 'on' : '' %>">GEO</a>
+          <a href="/language?lang=en" class="<%= lang === 'en' ? 'on' : '' %>">EN</a>
+        </div>
         <% if (member) { %>
           <span class="nav-user"><%= member.display_name || member.username %></span>
           <form class="nav-logout" method="post" action="/logout"><button type="submit"><%= t.logout %></button></form>
