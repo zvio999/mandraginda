@@ -398,23 +398,33 @@ app.post("/admin/messages/:id/delete", requireAdmin, (req, res) => {
   res.redirect("/admin/messages");
 });
 
-app.get("/admin/password", requireAdmin, (req, res) => {
-  renderAdmin(req, res, "password", { error: "" }, "Password");
+app.get("/admin/password", requireAdmin, (req, res) => res.redirect("/admin/user"));
+
+app.get("/admin/user", requireAdmin, (req, res) => {
+  const user = db.prepare("SELECT id, username FROM users WHERE id = ?").get(req.session.userId);
+  if (!user) return res.redirect("/admin/login");
+  renderAdmin(req, res, "user", { user, error: "" }, "User");
 });
 
-app.post("/admin/password", requireAdmin, (req, res) => {
+app.post("/admin/user", requireAdmin, (req, res) => {
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.session.userId);
+  const username = field(req.body.username);
+  const show = (error) => renderAdmin(req, res, "user", { user: { id: user.id, username: username || user.username }, error }, "User");
   if (!user || !verifyPassword(String(req.body.current || ""), user.salt, user.password_hash)) {
-    return renderAdmin(req, res, "password", { error: "Current password is wrong." }, "Password");
+    return show("Current password is wrong.");
   }
+  if (!username) return show("Enter a username.");
+  const taken = db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").get(username, user.id);
+  if (taken) return show("That username is already used.");
   const next = String(req.body.next || "");
-  if (next.length < 8) {
-    return renderAdmin(req, res, "password", { error: "Use at least 8 characters." }, "Password");
+  if (next && next.length < 8) return show("Use at least 8 characters.");
+  db.prepare("UPDATE users SET username = ? WHERE id = ?").run(username, user.id);
+  if (next) {
+    const { salt, hash } = hashPassword(next);
+    db.prepare("UPDATE users SET password_hash = ?, salt = ? WHERE id = ?").run(hash, salt, user.id);
   }
-  const { salt, hash } = hashPassword(next);
-  db.prepare("UPDATE users SET password_hash = ?, salt = ? WHERE id = ?").run(hash, salt, user.id);
-  req.session.flash = "Password changed.";
-  res.redirect("/admin/password");
+  req.session.flash = "User saved.";
+  res.redirect("/admin/user");
 });
 
 app.get("/:slug", (req, res, next) => {
