@@ -9,6 +9,39 @@
       <p><b><%= t.email %></b><span><%= member.email %></span></p>
       <form method="post" action="/logout"><button class="btn" type="submit"><%= t.logout %></button></form>
     </div>
+
+    <section class="garage-cars" aria-labelledby="my-cars">
+      <div class="garage-head">
+        <h2 id="my-cars"><%= t.myCars %> <small>(<%= cars.length %>)</small></h2>
+        <% if (cars.length < limit) { %><a class="btn dark" href="/garage/new"><%= t.addCar %></a><% } %>
+      </div>
+      <% if (!cars.length) { %>
+        <p class="garage-empty"><%= t.noCars %></p>
+      <% } else { %>
+        <div class="car-grid">
+          <% cars.forEach(function (car) { %>
+            <article class="car-card">
+              <% if (car.image) { %><img src="<%= car.image %>" alt="<%= car.title %>"><% } else { %><div class="car-photo"></div><% } %>
+              <div>
+                <h3><%= car.title %></h3>
+                <p><%= [car.manufacturer, car.model, car.year].filter(Boolean).join(' ') %></p>
+                <dl class="specs">
+                  <% [['engine', t.engine], ['fuel_type', t.fuel], ['tire_size', t.tireSize], ['tier_type', t.tireType], ['axle_lock', t.axleLock], ['others', t.other]].forEach(function (spec) { if (car[spec[0]]) { %>
+                    <div><small><%= spec[1] %></small><b><%= car[spec[0]] %></b></div>
+                  <% } }) %>
+                </dl>
+                <div class="garage-actions">
+                  <a class="btn" href="/garage/cars/<%= car.id %>"><%= t.edit %></a>
+                  <form method="post" action="/garage/cars/<%= car.id %>/delete" onsubmit="return confirm('<%= t.deleteConfirm %>')">
+                    <button class="btn quiet" type="submit"><%= t.delete %></button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          <% }) %>
+        </div>
+      <% } %>
+    </section>
   </div>
 </main>
 <%- include('partials/footer') %>

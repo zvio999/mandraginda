@@ -388,6 +388,20 @@ h1, h2, h3, h4 {
   border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; background: white; color: var(--navy-2);
 }
 .form textarea { min-height: 140px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.btn.quiet { background: var(--soft); color: var(--navy); }
+.btn.quiet:hover { background: var(--line); }
+.garage-cars { margin-top: 56px; }
+.garage-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+.garage-head h2 { margin: 0; }
+.garage-head small { color: var(--muted); font-weight: 400; }
+.garage-empty { background: var(--soft); padding: 20px 22px; border-radius: 8px; max-width: 640px; }
+.car-card h3 { margin: 0 0 4px; }
+.garage-cars .car-photo { height: 120px; min-height: 0; }
+.car-card dl.specs { margin: 14px 0 18px; }
+.garage-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.garage-actions form { margin: 0; }
+.garage-thumb { width: 220px; height: 140px; object-fit: cover; border-radius: 6px; }
 .note { background: #eef8e4; color: #24510f; padding: 12px 14px; border-radius: 6px; }
 
 .footer { background: var(--navy-2); color: #c9d3da; padding: 64px 0 20px; }
@@ -405,5 +419,6 @@ h1, h2, h3, h4 {
   .stats .wrap { grid-template-columns: 1fr 1fr; }
   .cards, .features, .comments, .news-grid, .car-grid, .split, .regions, .footer .cols { grid-template-columns: 1fr; }
   .gallery img { height: 140px; }
+  .form-row { grid-template-columns: 1fr; }
   .hero { min-height: 70vh; }
 }
