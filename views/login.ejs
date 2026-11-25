@@ -1,13 +1,13 @@
 <%- include('partials/header') %>
 <main class="page">
   <div class="wrap">
-    <div class="eyebrow">Account</div>
-    <h1>Login</h1>
+    <div class="eyebrow"><%= t.account %></div>
+    <h1><%= t.login %></h1>
     <% if (error) { %><p class="error"><%= error %></p><% } %>
     <form class="form" method="post" action="/login">
-      <label>Username or email<input name="username" required></label>
-      <label>Password<input type="password" name="password" required></label>
-      <button class="btn" type="submit">Login</button>
+      <label><%= t.usernameOrEmail %><input name="username" required></label>
+      <label><%= t.password %><input type="password" name="password" required></label>
+      <button class="btn" type="submit"><%= t.login %></button>
     </form>
   </div>
 </main>

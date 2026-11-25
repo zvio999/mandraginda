@@ -5,23 +5,23 @@
           <a class="logo" href="/"><img src="/media/mainlogo1.png" alt="Mandraginda"></a>
         </div>
         <div>
-          <h2>Community</h2>
+          <h2><%= t.community %></h2>
           <ul>
-            <li><a href="<%= home.socials.map %>" target="_blank" rel="noopener">Map</a></li>
-            <li><a href="/cars">Cars</a></li>
+            <li><a href="<%= home.socials.map %>" target="_blank" rel="noopener"><%= t.map %></a></li>
+            <li><a href="/cars"><%= t.cars %></a></li>
             <li><a href="<%= home.socials.youtube %>" target="_blank" rel="noopener">YouTube</a></li>
           </ul>
         </div>
         <div>
-          <h2>Help</h2>
+          <h2><%= t.help %></h2>
           <ul>
-            <li><a href="/contact">Contact us</a></li>
-            <li><a href="/terms-and-conditions">Terms and Conditions</a></li>
-            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/contact"><%= t.contactUs %></a></li>
+            <li><a href="/terms-and-conditions"><%= t.terms %></a></li>
+            <li><a href="/privacy-policy"><%= t.privacy %></a></li>
           </ul>
         </div>
         <div>
-          <h2>კონტაქტი</h2>
+          <h2><%= t.contact %></h2>
           <ul>
             <li><a href="mailto:<%= home.email %>"><%= home.email %></a></li>
             <li><a href="tel:<%= home.phoneHref %>"><%= home.phone %></a></li>
@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      <div class="legal">mandraginda.ge © 2024 . All rights reserved.</div>
+      <div class="legal">mandraginda.ge © 2024 . <%= t.rights %></div>
     </div>
   </footer>
   <script src="/js/site.js"></script>

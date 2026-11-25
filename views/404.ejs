@@ -1,9 +1,9 @@
 <%- include('partials/header') %>
 <main class="page">
   <div class="wrap">
-    <h1>Page not found</h1>
-    <p>That address is not on this site.</p>
-    <a class="btn" href="/">Back home</a>
+    <h1><%= t.notFound %></h1>
+    <p><%= t.notFoundText %></p>
+    <a class="btn" href="/"><%= t.backHome %></a>
   </div>
 </main>
 <%- include('partials/footer') %>

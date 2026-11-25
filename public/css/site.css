@@ -103,6 +103,11 @@ h1, h2, h3, h4 {
 }
 .nav a.nav-btn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy-2); }
 .nav a.nav-btn.gold:hover { background: var(--gold-2); color: var(--navy-2); }
+.lang { margin: 0; }
+.lang select {
+  border: 1px solid var(--line); background: white; color: var(--navy);
+  border-radius: 4px; padding: 8px 10px; font: inherit; font-weight: 600; font-size: 0.78rem;
+}
 .nav-user { font-weight: 600; color: var(--navy); }
 .nav-logout { margin: 0; }
 .nav-logout button {

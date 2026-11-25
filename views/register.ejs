@@ -1,15 +1,15 @@
 <%- include('partials/header') %>
 <main class="page">
   <div class="wrap">
-    <div class="eyebrow">Account</div>
-    <h1>Registration</h1>
+    <div class="eyebrow"><%= t.account %></div>
+    <h1><%= t.registration %></h1>
     <% if (error) { %><p class="error"><%= error %></p><% } %>
     <form class="form" method="post" action="/register">
-      <label>Full name<input name="name" value="<%= name %>" required></label>
-      <label>Username<input name="username" value="<%= username %>" required></label>
-      <label>Email<input type="email" name="email" value="<%= email %>" required></label>
-      <label>Password<input type="password" name="password" required minlength="8"></label>
-      <button class="btn" type="submit">Create account</button>
+      <label><%= t.fullName %><input name="name" value="<%= name %>" required></label>
+      <label><%= t.username %><input name="username" value="<%= username %>" required></label>
+      <label><%= t.email %><input type="email" name="email" value="<%= email %>" required></label>
+      <label><%= t.password %><input type="password" name="password" required minlength="8"></label>
+      <button class="btn" type="submit"><%= t.createAccount %></button>
     </form>
   </div>
 </main>

@@ -10,15 +10,15 @@
       <p><%= car.model %><% if (car.year) { %> · <%= car.year %><% } %></p>
       <div class="specs">
         <% [
-          ['Manufacturer', car.manufacturer],
-          ['Model', car.model],
-          ['Year', car.year],
-          ['Engine', car.engine],
-          ['Fuel', car.fuel_type],
-          ['Tire size', car.tire_size],
-          ['Tire type', car.tier_type],
-          ['Axle lock', car.axle_lock],
-          ['Other', car.others]
+          [t.manufacturer, car.manufacturer],
+          [t.model, car.model],
+          [t.year, car.year],
+          [t.engine, car.engine],
+          [t.fuel, car.fuel_type],
+          [t.tireSize, car.tire_size],
+          [t.tireType, car.tier_type],
+          [t.axleLock, car.axle_lock],
+          [t.other, car.others]
         ].forEach(function (row) { if (!row[1]) return; %>
           <div><small><%= row[0] %></small><b><%= row[1] %></b></div>
         <% }) %>

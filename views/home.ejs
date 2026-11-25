@@ -10,7 +10,7 @@
   </div>
 </section>
 
-<a class="map-link reveal" data-from="up" href="<%= home.socials.map %>" target="_blank" rel="noopener" aria-label="Open the Mandraginda map">
+<a class="map-link reveal" data-from="up" href="<%= home.socials.map %>" target="_blank" rel="noopener" aria-label="<%= t.openMap %>">
   <canvas id="georgia"></canvas>
 </a>
 <script src="/js/map.js"></script>
@@ -96,8 +96,8 @@
 
 <section class="section soft">
   <div class="wrap center">
-    <div class="eyebrow reveal" data-from="left">Partners</div>
-    <h2 class="reveal" data-from="left">Our partners</h2>
+    <div class="eyebrow reveal" data-from="left"><%= t.partnersEyebrow %></div>
+    <h2 class="reveal" data-from="left"><%= t.partnersTitle %></h2>
     <div class="partners">
       <% home.partners.forEach(function (partner, index) { %>
         <img class="reveal" data-from="up" style="--d:<%= index * 0.12 %>s" src="<%= partner.src %>" alt="<%= partner.alt %>">
@@ -110,15 +110,15 @@
   <div class="wrap center">
     <h2 class="reveal" data-from="up"><%= home.ctaTitle %></h2>
     <p class="lead reveal" data-from="fade" style="--d:0.36s"><%= home.ctaText %></p>
-    <a class="btn reveal" data-from="up" style="--d:0.55s" href="/contact">Contact us</a>
+    <a class="btn reveal" data-from="up" style="--d:0.55s" href="/contact"><%= t.contactUs %></a>
   </div>
 </section>
 
 <section class="section">
   <div class="wrap">
     <div class="center">
-      <div class="eyebrow reveal" data-from="up">YouTube</div>
-      <h2 class="reveal" data-from="up">Youtube Comments</h2>
+      <div class="eyebrow reveal" data-from="up"><%= t.youtube %></div>
+      <h2 class="reveal" data-from="up"><%= t.youtubeComments %></h2>
     </div>
     <div class="comments">
       <% home.comments.forEach(function (comment, index) { %>
@@ -157,7 +157,7 @@
             <time><%= post.published_at %></time>
             <h3><a href="/<%= post.slug %>"><%= post.title %></a></h3>
             <p><%= post.excerpt %></p>
-            <a class="btn dark" href="/<%= post.slug %>">Read</a>
+            <a class="btn dark" href="/<%= post.slug %>"><%= t.read %></a>
           </div>
         </article>
       <% }) %>

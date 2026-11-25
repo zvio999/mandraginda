@@ -7,11 +7,12 @@ const { open } = require("./lib/db");
 const { run } = require("./lib/import");
 const { hashPassword, verifyPassword } = require("./lib/auth");
 const { getHome, saveHome } = require("./lib/home");
+const { strings, localizeHome } = require("./lib/i18n");
 
 const root = path.join(__dirname);
 const uploadDir = path.join(root, "public", "media", "uploads");
 const sessions = new Map();
-const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout"]);
+const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout", "language"]);
 
 const storage = multer.diskStorage({
   destination: uploadDir,
@@ -77,9 +78,12 @@ app.use((req, res, next) => {
   const id = cookieId(req);
   req.session = sessions.get(id) || null;
   req.sid = id;
-  res.locals.home = getHome(db);
+  const lang = cookieValue(req, "lang") === "en" ? "en" : "ka";
+  res.locals.lang = lang;
+  res.locals.t = strings[lang];
+  res.locals.home = localizeHome(getHome(db), lang);
   res.locals.current = req.path;
-  res.locals.title = "mandraginda – off-road";
+  res.locals.title = res.locals.t.siteTitle;
   res.locals.member = null;
   const memberSession = sessions.get(cookieValue(req, "mid"));
   if (memberSession && memberSession.memberId && db) {
@@ -120,7 +124,7 @@ app.get("/", (req, res) => {
 
 app.get("/cars", (req, res) => {
   const cars = db.prepare("SELECT * FROM cars WHERE status = 'publish' ORDER BY title").all();
-  res.locals.title = "Cars – mandraginda";
+  res.locals.title = res.locals.t.carsTitle;
   res.render("cars", { cars });
 });
 
@@ -133,12 +137,12 @@ app.get("/car/:slug", (req, res) => {
 
 app.get("/news", (req, res) => {
   const posts = db.prepare("SELECT * FROM posts WHERE status = 'publish' ORDER BY published_at DESC").all();
-  res.locals.title = "News – mandraginda";
+  res.locals.title = res.locals.t.newsPageTitle;
   res.render("news", { posts });
 });
 
 app.get("/contact", (req, res) => {
-  res.locals.title = "Contact – mandraginda";
+  res.locals.title = res.locals.t.contactTitle;
   res.render("contact", { sent: req.query.sent === "1" });
 });
 
@@ -164,9 +168,21 @@ function setMember(res, memberId) {
   res.setHeader("Set-Cookie", "mid=" + id + "; HttpOnly; Path=/; SameSite=Lax");
 }
 
+app.get("/language", (req, res) => {
+  const lang = req.query.lang === "en" ? "en" : "ka";
+  res.setHeader("Set-Cookie", "lang=" + lang + "; Path=/; Max-Age=31536000; SameSite=Lax");
+  let back = "/";
+  const ref = req.get("referer") || "";
+  try {
+    const url = new URL(ref);
+    if (url.host === req.get("host") && url.pathname.indexOf("/language") !== 0) back = url.pathname + url.search;
+  } catch (error) {}
+  res.redirect(back);
+});
+
 app.get("/login", (req, res) => {
   if (res.locals.member) return res.redirect("/");
-  res.locals.title = "Login – mandraginda";
+  res.locals.title = res.locals.t.loginTitle;
   res.render("login", { error: "" });
 });
 
@@ -174,8 +190,8 @@ app.post("/login", (req, res) => {
   const key = field(req.body.username).toLowerCase();
   const member = db.prepare("SELECT * FROM members WHERE lower(username) = ? OR lower(email) = ?").get(key, key);
   if (!member || !member.password_hash || !verifyPassword(String(req.body.password || ""), member.salt, member.password_hash)) {
-    res.locals.title = "Login – mandraginda";
-    return res.status(401).render("login", { error: "Those details do not match." });
+    res.locals.title = res.locals.t.loginTitle;
+    return res.status(401).render("login", { error: res.locals.t.badLogin });
   }
   setMember(res, member.id);
   res.redirect("/");
@@ -183,7 +199,7 @@ app.post("/login", (req, res) => {
 
 app.get("/register", (req, res) => {
   if (res.locals.member) return res.redirect("/");
-  res.locals.title = "Registration – mandraginda";
+  res.locals.title = res.locals.t.registerTitle;
   res.render("register", { error: "", name: "", username: "", email: "" });
 });
 
@@ -193,14 +209,14 @@ app.post("/register", (req, res) => {
   const email = field(req.body.email);
   const password = String(req.body.password || "");
   const show = (error) => {
-    res.locals.title = "Registration – mandraginda";
+    res.locals.title = res.locals.t.registerTitle;
     res.status(400).render("register", { error, name, username, email });
   };
-  if (!name || !username || !email) return show("Fill in every field.");
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show("Enter a valid email.");
-  if (password.length < 8) return show("Use at least 8 characters.");
+  if (!name || !username || !email) return show(res.locals.t.fillFields);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show(res.locals.t.badEmail);
+  if (password.length < 8) return show(res.locals.t.shortPassword);
   const taken = db.prepare("SELECT id FROM members WHERE lower(username) = ? OR lower(email) = ?").get(username.toLowerCase(), email.toLowerCase());
-  if (taken) return show("That username or email is already registered.");
+  if (taken) return show(res.locals.t.taken);
   const { salt, hash } = hashPassword(password);
   db.prepare("INSERT INTO members (username, email, display_name, password_hash, salt) VALUES (?, ?, ?, ?, ?)").run(
     username,

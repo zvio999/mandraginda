@@ -1,8 +1,8 @@
 <%- include('partials/header') %>
 <main class="page">
   <div class="wrap">
-    <div class="eyebrow">News and articles</div>
-    <h1>Learn more about off-roading</h1>
+    <div class="eyebrow"><%= t.newsEyebrow %></div>
+    <h1><%= t.newsTitle %></h1>
     <div class="news-grid">
       <% posts.forEach(function (post) { %>
         <article class="news-card">
