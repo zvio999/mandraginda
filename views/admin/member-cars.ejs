@@ -1,0 +1,27 @@
+<div class="panel">
+  <div class="row">
+    <h1>Member cars</h1>
+    <span><%= cars.length %></span>
+  </div>
+  <% if (!cars.length) { %>
+    <p>No member has added a car yet.</p>
+  <% } else { %>
+    <table>
+      <tr><th>Photo</th><th>Car</th><th>Owner</th><th>Details</th><th>Added</th><th></th></tr>
+      <% cars.forEach(function (car) { %>
+        <tr>
+          <td><% if (car.image) { %><img class="thumb" src="<%= car.image %>" alt="<%= car.title %>"><% } %></td>
+          <td><b><%= car.title %></b><br><%= [car.manufacturer, car.model, car.year].filter(Boolean).join(' ') %></td>
+          <td><%= car.display_name || car.username || 'Deleted member' %><% if (car.email) { %><br><small><%= car.email %></small><% } %></td>
+          <td><small><%= [car.engine, car.fuel_type, car.tire_size, car.tier_type, car.axle_lock, car.others].filter(Boolean).join(' · ') %></small></td>
+          <td><%= car.created_at %></td>
+          <td>
+            <form method="post" action="/admin/member-cars/<%= car.id %>/delete" onsubmit="return confirm('Delete this car?')">
+              <button class="btn quiet" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+</div>

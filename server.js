@@ -180,10 +180,68 @@ app.get("/language", (req, res) => {
   res.redirect(back);
 });
 
-app.get("/garage", (req, res) => {
+const MAX_MEMBER_CARS = 20;
+const memberCarFields = ["manufacturer", "model", "year", "engine", "fuel_type", "tire_size", "tier_type", "axle_lock", "others"];
+
+function requireMember(req, res, next) {
   if (!res.locals.member) return res.redirect("/login");
+  next();
+}
+
+function memberCar(req, res) {
+  return db.prepare("SELECT * FROM member_cars WHERE id = ? AND member_id = ?").get(Number(req.params.id), res.locals.member.id);
+}
+
+function renderGarageCar(res, car, error, status) {
   res.locals.title = res.locals.t.garageTitle;
-  res.render("garage", { member: res.locals.member });
+  res.status(status || 200).render("garage-car", { car, error: error || "" });
+}
+
+app.get("/garage", requireMember, (req, res) => {
+  const cars = db.prepare("SELECT * FROM member_cars WHERE member_id = ? ORDER BY id DESC").all(res.locals.member.id);
+  res.locals.title = res.locals.t.garageTitle;
+  res.render("garage", { member: res.locals.member, cars, limit: MAX_MEMBER_CARS });
+});
+
+app.get("/garage/new", requireMember, (req, res) => renderGarageCar(res, {}));
+
+app.get("/garage/cars/:id", requireMember, (req, res) => {
+  const car = memberCar(req, res);
+  if (!car) return res.redirect("/garage");
+  renderGarageCar(res, car);
+});
+
+function saveMemberCar(req, res) {
+  const existing = req.params.id ? memberCar(req, res) : null;
+  if (req.params.id && !existing) return res.redirect("/garage");
+  const values = { title: field(req.body.title).slice(0, 120) };
+  memberCarFields.forEach((name) => {
+    values[name] = field(req.body[name]).slice(0, 200);
+  });
+  values.image = req.file ? "/media/uploads/" + req.file.filename : existing ? existing.image : "";
+  if (!values.title) return renderGarageCar(res, { ...existing, ...values }, res.locals.t.carNameRequired, 400);
+  const columns = ["title"].concat(memberCarFields, ["image"]);
+  if (existing) {
+    db.prepare("UPDATE member_cars SET " + columns.map((c) => c + " = ?").join(", ") + " WHERE id = ? AND member_id = ?").run(
+      ...columns.map((c) => values[c]),
+      existing.id,
+      res.locals.member.id
+    );
+  } else {
+    const count = db.prepare("SELECT COUNT(*) AS n FROM member_cars WHERE member_id = ?").get(res.locals.member.id).n;
+    if (count >= MAX_MEMBER_CARS) return renderGarageCar(res, values, res.locals.t.carLimit, 400);
+    db.prepare(
+      "INSERT INTO member_cars (member_id, " + columns.join(", ") + ", created_at) VALUES (?, " + columns.map(() => "?").join(", ") + ", ?)"
+    ).run(res.locals.member.id, ...columns.map((c) => values[c]), new Date().toISOString().slice(0, 16).replace("T", " "));
+  }
+  res.redirect("/garage");
+}
+
+app.post("/garage/cars", requireMember, upload.single("image"), saveMemberCar);
+app.post("/garage/cars/:id", requireMember, upload.single("image"), saveMemberCar);
+app.post("/garage/cars/:id/delete", requireMember, (req, res) => {
+  db.prepare("DELETE FROM member_cars WHERE id = ? AND member_id = ?").run(Number(req.params.id), res.locals.member.id);
+  res.redirect("/garage");
 });
 
 app.get("/login", (req, res) => {
@@ -494,8 +552,23 @@ app.post("/admin/messages/:id/delete", requireAdmin, (req, res) => {
 
 app.get("/admin/password", requireAdmin, (req, res) => res.redirect("/admin/user"));
 
+app.get("/admin/member-cars", requireAdmin, (req, res) => {
+  const cars = db.prepare(
+    "SELECT c.*, m.username, m.display_name, m.email FROM member_cars c LEFT JOIN members m ON m.id = c.member_id ORDER BY c.id DESC"
+  ).all();
+  renderAdmin(req, res, "member-cars", { cars }, "Member cars");
+});
+
+app.post("/admin/member-cars/:id/delete", requireAdmin, (req, res) => {
+  db.prepare("DELETE FROM member_cars WHERE id = ?").run(Number(req.params.id));
+  req.session.flash = "Member car deleted.";
+  res.redirect("/admin/member-cars");
+});
+
 function memberList() {
-  return db.prepare("SELECT id, username, email, display_name FROM members ORDER BY display_name").all();
+  return db.prepare(
+    "SELECT m.id, m.username, m.email, m.display_name, (SELECT COUNT(*) FROM member_cars c WHERE c.member_id = m.id) AS car_count FROM members m ORDER BY m.display_name"
+  ).all();
 }
 
 app.get("/admin/user", requireAdmin, (req, res) => {

@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+<main class="page">
+  <div class="wrap">
+    <div class="eyebrow"><%= t.garage %></div>
+    <h1><%= car.id ? t.editCar : t.addCar %></h1>
+    <% if (error) { %><p class="error"><%= error %></p><% } %>
+    <form class="form" method="post" action="<%= car.id ? '/garage/cars/' + car.id : '/garage/cars' %>" enctype="multipart/form-data">
+      <label><%= t.carName %><input name="title" value="<%= car.title || '' %>" maxlength="120" required placeholder="Toyota Land Cruiser 80"></label>
+      <div class="form-row">
+        <label><%= t.manufacturer %><input name="manufacturer" value="<%= car.manufacturer || '' %>" maxlength="200"></label>
+        <label><%= t.model %><input name="model" value="<%= car.model || '' %>" maxlength="200"></label>
+      </div>
+      <div class="form-row">
+        <label><%= t.year %><input name="year" inputmode="numeric" value="<%= car.year || '' %>" maxlength="200"></label>
+        <label><%= t.engine %><input name="engine" value="<%= car.engine || '' %>" maxlength="200"></label>
+      </div>
+      <div class="form-row">
+        <label><%= t.fuel %><input name="fuel_type" value="<%= car.fuel_type || '' %>" maxlength="200"></label>
+        <label><%= t.axleLock %><input name="axle_lock" value="<%= car.axle_lock || '' %>" maxlength="200"></label>
+      </div>
+      <div class="form-row">
+        <label><%= t.tireSize %><input name="tire_size" value="<%= car.tire_size || '' %>" maxlength="200"></label>
+        <label><%= t.tireType %><input name="tier_type" value="<%= car.tier_type || '' %>" maxlength="200"></label>
+      </div>
+      <label><%= t.otherEquipment %><input name="others" value="<%= car.others || '' %>" maxlength="200"></label>
+      <label><%= t.photo %><input type="file" name="image" accept="image/*"></label>
+      <% if (car.image) { %><img class="garage-thumb" src="<%= car.image %>" alt="<%= car.title %>"><% } %>
+      <div class="garage-actions">
+        <button class="btn" type="submit"><%= t.save %></button>
+        <a class="btn quiet" href="/garage"><%= t.cancel %></a>
+      </div>
+    </form>
+  </div>
+</main>
+<%- include('partials/footer') %>

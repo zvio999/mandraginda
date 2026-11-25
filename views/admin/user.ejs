@@ -7,12 +7,13 @@
     <p>No registered users were found.</p>
   <% } else { %>
     <table>
-      <tr><th>Name</th><th>Username</th><th>Email</th></tr>
+      <tr><th>Name</th><th>Username</th><th>Email</th><th>Cars</th></tr>
       <% members.forEach(function (member) { %>
         <tr>
           <td><%= member.display_name || member.username %></td>
           <td><%= member.username %></td>
           <td><%= member.email %></td>
+          <td><%= member.car_count %></td>
         </tr>
       <% }) %>
     </table>
