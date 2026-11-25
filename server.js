@@ -11,7 +11,7 @@ const { getHome, saveHome } = require("./lib/home");
 const root = path.join(__dirname);
 const uploadDir = path.join(root, "public", "media", "uploads");
 const sessions = new Map();
-const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email"]);
+const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout"]);
 
 const storage = multer.diskStorage({
   destination: uploadDir,
@@ -28,9 +28,13 @@ const upload = multer({
   },
 });
 
+function cookieValue(req, name) {
+  const raw = (req.headers.cookie || "").split(";").map((part) => part.trim()).find((part) => part.startsWith(name + "="));
+  return raw ? decodeURIComponent(raw.slice(name.length + 1)) : "";
+}
+
 function cookieId(req) {
-  const raw = (req.headers.cookie || "").split(";").map((part) => part.trim()).find((part) => part.startsWith("sid="));
-  return raw ? decodeURIComponent(raw.slice(4)) : "";
+  return cookieValue(req, "sid");
 }
 
 function setSession(res, data) {
@@ -76,6 +80,11 @@ app.use((req, res, next) => {
   res.locals.home = getHome(db);
   res.locals.current = req.path;
   res.locals.title = "mandraginda – off-road";
+  res.locals.member = null;
+  const memberSession = sessions.get(cookieValue(req, "mid"));
+  if (memberSession && memberSession.memberId && db) {
+    res.locals.member = db.prepare("SELECT id, username, display_name FROM members WHERE id = ?").get(memberSession.memberId) || null;
+  }
   next();
 });
 
@@ -147,6 +156,69 @@ app.post("/contact", (req, res) => {
     new Date().toISOString().slice(0, 16).replace("T", " ")
   );
   res.redirect("/contact?sent=1");
+});
+
+function setMember(res, memberId) {
+  const id = crypto.randomBytes(24).toString("hex");
+  sessions.set(id, { memberId: memberId });
+  res.setHeader("Set-Cookie", "mid=" + id + "; HttpOnly; Path=/; SameSite=Lax");
+}
+
+app.get("/login", (req, res) => {
+  if (res.locals.member) return res.redirect("/");
+  res.locals.title = "Login – mandraginda";
+  res.render("login", { error: "" });
+});
+
+app.post("/login", (req, res) => {
+  const key = field(req.body.username).toLowerCase();
+  const member = db.prepare("SELECT * FROM members WHERE lower(username) = ? OR lower(email) = ?").get(key, key);
+  if (!member || !member.password_hash || !verifyPassword(String(req.body.password || ""), member.salt, member.password_hash)) {
+    res.locals.title = "Login – mandraginda";
+    return res.status(401).render("login", { error: "Those details do not match." });
+  }
+  setMember(res, member.id);
+  res.redirect("/");
+});
+
+app.get("/register", (req, res) => {
+  if (res.locals.member) return res.redirect("/");
+  res.locals.title = "Registration – mandraginda";
+  res.render("register", { error: "", name: "", username: "", email: "" });
+});
+
+app.post("/register", (req, res) => {
+  const name = field(req.body.name);
+  const username = field(req.body.username);
+  const email = field(req.body.email);
+  const password = String(req.body.password || "");
+  const show = (error) => {
+    res.locals.title = "Registration – mandraginda";
+    res.status(400).render("register", { error, name, username, email });
+  };
+  if (!name || !username || !email) return show("Fill in every field.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show("Enter a valid email.");
+  if (password.length < 8) return show("Use at least 8 characters.");
+  const taken = db.prepare("SELECT id FROM members WHERE lower(username) = ? OR lower(email) = ?").get(username.toLowerCase(), email.toLowerCase());
+  if (taken) return show("That username or email is already registered.");
+  const { salt, hash } = hashPassword(password);
+  db.prepare("INSERT INTO members (username, email, display_name, password_hash, salt) VALUES (?, ?, ?, ?, ?)").run(
+    username,
+    email,
+    name,
+    hash,
+    salt
+  );
+  const created = db.prepare("SELECT id FROM members WHERE username = ?").get(username);
+  setMember(res, created.id);
+  res.redirect("/");
+});
+
+app.post("/logout", (req, res) => {
+  const id = cookieValue(req, "mid");
+  if (id) sessions.delete(id);
+  res.setHeader("Set-Cookie", "mid=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+  res.redirect("/");
 });
 
 app.get("/send-email", (req, res) => res.redirect("/contact"));
