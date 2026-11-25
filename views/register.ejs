@@ -5,7 +5,7 @@
     <h1>Registration</h1>
     <% if (error) { %><p class="error"><%= error %></p><% } %>
     <form class="form" method="post" action="/register">
-      <label>Name<input name="name" value="<%= name %>" required></label>
+      <label>Full name<input name="name" value="<%= name %>" required></label>
       <label>Username<input name="username" value="<%= username %>" required></label>
       <label>Email<input type="email" name="email" value="<%= email %>" required></label>
       <label>Password<input type="password" name="password" required minlength="8"></label>
