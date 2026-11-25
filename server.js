@@ -400,16 +400,20 @@ app.post("/admin/messages/:id/delete", requireAdmin, (req, res) => {
 
 app.get("/admin/password", requireAdmin, (req, res) => res.redirect("/admin/user"));
 
+function memberList() {
+  return db.prepare("SELECT id, username, email, display_name FROM members ORDER BY display_name").all();
+}
+
 app.get("/admin/user", requireAdmin, (req, res) => {
   const user = db.prepare("SELECT id, username FROM users WHERE id = ?").get(req.session.userId);
   if (!user) return res.redirect("/admin/login");
-  renderAdmin(req, res, "user", { user, error: "" }, "User");
+  renderAdmin(req, res, "user", { user, members: memberList(), error: "" }, "Users");
 });
 
 app.post("/admin/user", requireAdmin, (req, res) => {
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.session.userId);
   const username = field(req.body.username);
-  const show = (error) => renderAdmin(req, res, "user", { user: { id: user.id, username: username || user.username }, error }, "User");
+  const show = (error) => renderAdmin(req, res, "user", { user: { id: user.id, username: username || user.username }, members: memberList(), error }, "Users");
   if (!user || !verifyPassword(String(req.body.current || ""), user.salt, user.password_hash)) {
     return show("Current password is wrong.");
   }

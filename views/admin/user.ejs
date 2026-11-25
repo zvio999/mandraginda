@@ -1,10 +1,31 @@
 <div class="panel">
-  <h1>User</h1>
+  <div class="row">
+    <h1>Users</h1>
+    <span><%= members.length %></span>
+  </div>
+  <% if (!members.length) { %>
+    <p>No registered users were found.</p>
+  <% } else { %>
+    <table>
+      <tr><th>Name</th><th>Username</th><th>Email</th></tr>
+      <% members.forEach(function (member) { %>
+        <tr>
+          <td><%= member.display_name || member.username %></td>
+          <td><%= member.username %></td>
+          <td><%= member.email %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+</div>
+
+<div class="panel" style="margin-top:16px">
+  <h1>Control panel login</h1>
   <% if (error) { %><p class="error"><%= error %></p><% } %>
   <form method="post" action="/admin/user">
     <label>Username<input name="username" value="<%= user.username %>" required></label>
     <label>Current password<input type="password" name="current" required></label>
     <label>New password<input type="password" name="next" minlength="8" placeholder="Leave empty to keep the current password"></label>
-    <button class="btn gold" type="submit">Save user</button>
+    <button class="btn gold" type="submit">Save login</button>
   </form>
 </div>
