@@ -12,7 +12,7 @@ const { strings, localizeHome } = require("./lib/i18n");
 const root = path.join(__dirname);
 const uploadDir = path.join(root, "public", "media", "uploads");
 const sessions = new Map();
-const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout", "language"]);
+const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout", "language", "garage"]);
 
 const storage = multer.diskStorage({
   destination: uploadDir,
@@ -87,7 +87,7 @@ app.use((req, res, next) => {
   res.locals.member = null;
   const memberSession = sessions.get(cookieValue(req, "mid"));
   if (memberSession && memberSession.memberId && db) {
-    res.locals.member = db.prepare("SELECT id, username, display_name FROM members WHERE id = ?").get(memberSession.memberId) || null;
+    res.locals.member = db.prepare("SELECT id, username, email, display_name FROM members WHERE id = ?").get(memberSession.memberId) || null;
   }
   next();
 });
@@ -180,8 +180,14 @@ app.get("/language", (req, res) => {
   res.redirect(back);
 });
 
+app.get("/garage", (req, res) => {
+  if (!res.locals.member) return res.redirect("/login");
+  res.locals.title = res.locals.t.garageTitle;
+  res.render("garage", { member: res.locals.member });
+});
+
 app.get("/login", (req, res) => {
-  if (res.locals.member) return res.redirect("/");
+  if (res.locals.member) return res.redirect("/garage");
   res.locals.title = res.locals.t.loginTitle;
   res.render("login", { error: "" });
 });
@@ -194,11 +200,11 @@ app.post("/login", (req, res) => {
     return res.status(401).render("login", { error: res.locals.t.badLogin });
   }
   setMember(res, member.id);
-  res.redirect("/");
+  res.redirect("/garage");
 });
 
 app.get("/register", (req, res) => {
-  if (res.locals.member) return res.redirect("/");
+  if (res.locals.member) return res.redirect("/garage");
   res.locals.title = res.locals.t.registerTitle;
   res.render("register", { error: "", name: "", username: "", email: "" });
 });
@@ -227,7 +233,7 @@ app.post("/register", (req, res) => {
   );
   const created = db.prepare("SELECT id FROM members WHERE username = ?").get(username);
   setMember(res, created.id);
-  res.redirect("/");
+  res.redirect("/garage");
 });
 
 app.post("/logout", (req, res) => {
