@@ -433,9 +433,9 @@ app.get("/:slug", (req, res, next) => {
 });
 
 run()
-  .then(() => {
+  .then(async () => {
     require("fs").mkdirSync(uploadDir, { recursive: true });
-    db = open();
+    db = await open();
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
       console.log("Mandraginda is running at http://localhost:" + port);
