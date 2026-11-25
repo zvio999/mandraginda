@@ -103,11 +103,24 @@ h1, h2, h3, h4 {
 }
 .nav a.nav-btn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy-2); }
 .nav a.nav-btn.gold:hover { background: var(--gold-2); color: var(--navy-2); }
-.lang { margin: 0; }
-.lang select {
-  border: 1px solid var(--line); background: white; color: var(--navy);
-  border-radius: 4px; padding: 8px 10px; font: inherit; font-weight: 600; font-size: 0.78rem;
+.lang { position: relative; }
+.lang summary {
+  list-style: none; cursor: pointer; color: var(--navy); font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
 }
+.lang summary::-webkit-details-marker { display: none; }
+.lang summary::after {
+  content: ""; width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+}
+.lang div {
+  position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%);
+  min-width: 88px; background: white; border-radius: 8px; padding: 6px;
+  border: 1px solid rgba(4, 41, 58, 0.08); box-shadow: var(--shadow); z-index: 30;
+}
+.nav .lang a { display: block; padding: 8px 14px; border-radius: 6px; text-align: center; font-weight: 600; }
+.nav .lang a:hover, .nav .lang a.active { background: rgba(236, 179, 101, 0.22); color: var(--navy-2); }
 .nav-user { font-weight: 600; color: var(--navy); }
 .nav-logout { margin: 0; }
 .nav-logout button {
