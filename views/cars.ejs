@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<main class="page">
+  <div class="wrap">
+    <div class="eyebrow">Fleet</div>
+    <h1>Cars</h1>
+    <div class="car-grid">
+      <% cars.forEach(function (car) { %>
+        <article class="car-card">
+          <a href="/car/<%= car.slug %>">
+            <% if (car.image) { %><img src="<%= car.image %>" alt="<%= car.title %>"><% } else { %><div class="car-photo"></div><% } %>
+          </a>
+          <div>
+            <h2><a href="/car/<%= car.slug %>"><%= car.title %></a></h2>
+            <p><%= car.manufacturer %> <%= car.model %> <%= car.year %></p>
+            <a class="btn dark" href="/car/<%= car.slug %>">Details</a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>

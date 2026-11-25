@@ -1,0 +1,26 @@
+<div class="panel">
+  <h1><%= post.id ? 'Edit article' : 'New article' %></h1>
+  <form method="post" action="<%= post.id ? '/admin/posts/' + post.id : '/admin/posts' %>" enctype="multipart/form-data">
+    <label>Title<input name="title" value="<%= post.title || '' %>" required></label>
+    <div class="grid">
+      <label>Address slug<input name="slug" value="<%= post.slug || '' %>"></label>
+      <label>Date<input name="published_at" value="<%= post.published_at || '' %>" placeholder="2025-01-31"></label>
+    </div>
+    <label>Short text<textarea name="excerpt"><%= post.excerpt || '' %></textarea></label>
+    <label>Article<textarea name="body" style="min-height:280px"><%= post.body || '' %></textarea></label>
+    <label>Photo<input type="file" name="image" accept="image/*"></label>
+    <% if (post.image) { %><img class="thumb" src="<%= post.image %>" alt=""><% } %>
+    <label>Status
+      <select name="status">
+        <option value="publish" <%= post.status !== 'draft' ? 'selected' : '' %>>Published</option>
+        <option value="draft" <%= post.status === 'draft' ? 'selected' : '' %>>Hidden</option>
+      </select>
+    </label>
+    <button class="btn gold" type="submit">Save</button>
+  </form>
+  <% if (post.id) { %>
+    <form method="post" action="/admin/posts/<%= post.id %>/delete" onsubmit="return confirm('Delete this article?')">
+      <button class="btn quiet" type="submit">Delete article</button>
+    </form>
+  <% } %>
+</div>

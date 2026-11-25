@@ -1,0 +1,20 @@
+<%- include('partials/header') %>
+<main class="page">
+  <div class="wrap">
+    <div class="eyebrow">News and articles</div>
+    <h1>Learn more about off-roading</h1>
+    <div class="news-grid">
+      <% posts.forEach(function (post) { %>
+        <article class="news-card">
+          <% if (post.image) { %><a href="/<%= post.slug %>"><img src="<%= post.image %>" alt=""></a><% } %>
+          <div>
+            <time><%= post.published_at %></time>
+            <h3><a href="/<%= post.slug %>"><%= post.title %></a></h3>
+            <p><%= post.excerpt %></p>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>

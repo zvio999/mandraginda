@@ -1,0 +1,22 @@
+<div class="panel">
+  <h1>Messages</h1>
+  <% if (!messages.length) { %><p>No messages yet.</p><% } %>
+  <table>
+    <% messages.forEach(function (message) { %>
+      <tr>
+        <td>
+          <strong><%= message.name %></strong><br>
+          <a href="mailto:<%= message.email %>"><%= message.email %></a><br>
+          <%= message.phone %>
+        </td>
+        <td><%= message.body %></td>
+        <td><%= message.created_at %><% if (!message.is_read) { %><br>New<% } %></td>
+        <td>
+          <form method="post" action="/admin/messages/<%= message.id %>/delete">
+            <button class="btn quiet" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+</div>

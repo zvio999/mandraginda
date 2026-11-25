@@ -1,0 +1,19 @@
+<div class="cards">
+  <div class="card"><b><%= counts.cars %></b>Cars</div>
+  <div class="card"><b><%= counts.posts %></b>Articles</div>
+  <div class="card"><b><%= counts.pages %></b>Pages</div>
+  <div class="card"><b><%= counts.messages %></b>New messages</div>
+</div>
+<div class="panel">
+  <div class="row"><h1>Recent messages</h1><a class="btn" href="/admin/messages">All messages</a></div>
+  <% if (!messages.length) { %><p>No messages yet.</p><% } %>
+  <table>
+    <% messages.forEach(function (message) { %>
+      <tr>
+        <td><strong><%= message.name %></strong><br><%= message.email %></td>
+        <td><%= message.body %></td>
+        <td><%= message.created_at %></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>

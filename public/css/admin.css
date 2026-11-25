@@ -1,0 +1,45 @@
+:root {
+  --navy: #04293a;
+  --gold: #ecb365;
+  --line: #e4e4e4;
+  --soft: #f4f6f7;
+  --text: #243038;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Prompt, "Noto Sans Georgian", sans-serif; color: var(--text); background: var(--soft); }
+a { color: var(--navy); }
+button, input, textarea, select { font: inherit; }
+.login {
+  min-height: 100vh; display: grid; place-items: center; background: var(--navy); color: white;
+}
+.login form { width: min(420px, calc(100% - 32px)); background: white; color: var(--text); padding: 28px; border-radius: 12px; display: grid; gap: 12px; }
+.login h1 { margin: 0; font-size: 1.6rem; }
+.shell { display: grid; grid-template-columns: 230px 1fr; min-height: 100vh; }
+.side { background: var(--navy); color: white; padding: 22px 16px; }
+.side a { color: white; text-decoration: none; display: block; padding: 10px 12px; border-radius: 8px; }
+.side a:hover, .side a.active { background: rgba(236, 179, 101, 0.2); }
+.side .brand { font-weight: 700; letter-spacing: 0.04em; padding: 8px 12px 18px; }
+.main { padding: 28px; }
+.panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 8px 30px rgba(4,28,50,.06); }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.btn, button.btn {
+  background: var(--navy); color: white; border: 0; border-radius: 6px; padding: 9px 14px; text-decoration: none; cursor: pointer; display: inline-block;
+}
+.btn.gold { background: var(--gold); color: var(--navy); }
+.btn.quiet { background: transparent; color: #8a3030; padding: 0; }
+label { display: grid; gap: 6px; margin: 12px 0; font-weight: 600; }
+input, textarea, select { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; width: 100%; }
+textarea { min-height: 120px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+.card { background: white; border-radius: 12px; padding: 16px; }
+.card b { display: block; font-size: 1.8rem; }
+.error { background: #fde8e8; color: #8a1f1f; padding: 10px 12px; border-radius: 8px; }
+.ok { background: #e7f6df; color: #24510f; padding: 10px 12px; border-radius: 8px; }
+.thumb { width: 72px; height: 48px; object-fit: cover; border-radius: 4px; }
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; }
+  .cards, .grid { grid-template-columns: 1fr; }
+}

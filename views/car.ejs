@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+<main class="page">
+  <div class="wrap split">
+    <div>
+      <% if (car.image) { %><img class="car-photo" src="<%= car.image %>" alt="<%= car.title %>"><% } %>
+    </div>
+    <div>
+      <div class="eyebrow"><%= car.manufacturer %></div>
+      <h1><%= car.title %></h1>
+      <p><%= car.model %><% if (car.year) { %> · <%= car.year %><% } %></p>
+      <div class="specs">
+        <% [
+          ['Manufacturer', car.manufacturer],
+          ['Model', car.model],
+          ['Year', car.year],
+          ['Engine', car.engine],
+          ['Fuel', car.fuel_type],
+          ['Tire size', car.tire_size],
+          ['Tire type', car.tier_type],
+          ['Axle lock', car.axle_lock],
+          ['Other', car.others]
+        ].forEach(function (row) { if (!row[1]) return; %>
+          <div><small><%= row[0] %></small><b><%= row[1] %></b></div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>

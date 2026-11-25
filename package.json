@@ -1,0 +1,16 @@
+{
+  "name": "mandraginda",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Mandraginda site and control panel, without WordPress",
+  "scripts": {
+    "start": "node --no-warnings server.js",
+    "import": "node --no-warnings lib/import.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "fast-xml-parser": "^4.5.1",
+    "multer": "^1.4.5-lts.2"
+  }
+}

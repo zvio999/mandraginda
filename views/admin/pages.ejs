@@ -1,0 +1,12 @@
+<div class="panel">
+  <div class="row"><h1>Pages</h1><a class="btn gold" href="/admin/pages/new">New page</a></div>
+  <table>
+    <% pages.forEach(function (page) { %>
+      <tr>
+        <td><strong><%= page.title %></strong><br>/<%= page.slug %></td>
+        <td><%= page.status %></td>
+        <td><a href="/admin/pages/<%= page.id %>">Edit</a></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>

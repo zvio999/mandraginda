@@ -1,0 +1,20 @@
+<div class="panel">
+  <h1><%= page.id ? 'Edit page' : 'New page' %></h1>
+  <form method="post" action="<%= page.id ? '/admin/pages/' + page.id : '/admin/pages' %>">
+    <label>Title<input name="title" value="<%= page.title || '' %>" required></label>
+    <label>Address slug<input name="slug" value="<%= page.slug || '' %>"></label>
+    <label>Content<textarea name="body" style="min-height:320px"><%= page.body || '' %></textarea></label>
+    <label>Status
+      <select name="status">
+        <option value="publish" <%= page.status !== 'draft' ? 'selected' : '' %>>Published</option>
+        <option value="draft" <%= page.status === 'draft' ? 'selected' : '' %>>Hidden</option>
+      </select>
+    </label>
+    <button class="btn gold" type="submit">Save</button>
+  </form>
+  <% if (page.id) { %>
+    <form method="post" action="/admin/pages/<%= page.id %>/delete" onsubmit="return confirm('Delete this page?')">
+      <button class="btn quiet" type="submit">Delete page</button>
+    </form>
+  <% } %>
+</div>

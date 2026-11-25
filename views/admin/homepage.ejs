@@ -1,0 +1,63 @@
+<div class="panel">
+  <h1>Homepage</h1>
+  <form method="post" action="/admin/homepage">
+    <div class="grid">
+      <label>Phone<input name="phone" value="<%= home.phone %>"></label>
+      <label>Phone link<input name="phoneHref" value="<%= home.phoneHref %>"></label>
+      <label>Info email<input name="email" value="<%= home.email %>"></label>
+      <label>Sales email<input name="saleEmail" value="<%= home.saleEmail %>"></label>
+    </div>
+    <label>Hero title<input name="heroTitle" value="<%= home.heroTitle %>"></label>
+    <label>Hero text<input name="heroText" value="<%= home.heroText %>"></label>
+    <div class="grid">
+      <label>Button text<input name="heroButton" value="<%= home.heroButton %>"></label>
+      <label>Button link<input name="heroLink" value="<%= home.heroLink %>"></label>
+    </div>
+    <h2>Numbers</h2>
+    <% home.stats.forEach(function (stat, i) { %>
+      <div class="grid">
+        <label>Label<input name="stat_label_<%= i %>" value="<%= stat.label %>"></label>
+        <label>Value<input name="stat_value_<%= i %>" value="<%= stat.value %>"></label>
+        <label>Suffix<input name="stat_suffix_<%= i %>" value="<%= stat.suffix %>"></label>
+      </div>
+    <% }) %>
+    <label>Departures label<input name="tripsLabel" value="<%= home.tripsLabel %>"></label>
+    <label>Departures<input name="trips" value="<%= home.trips %>"></label>
+    <h2>Events</h2>
+    <label>Eyebrow<input name="eventsEyebrow" value="<%= home.eventsEyebrow %>"></label>
+    <label>Title<input name="eventsTitle" value="<%= home.eventsTitle %>"></label>
+    <label>Text<textarea name="eventsText"><%= home.eventsText %></textarea></label>
+    <% home.events.forEach(function (event, i) { %>
+      <div class="grid">
+        <label>Kicker<input name="event_kicker_<%= i %>" value="<%= event.kicker %>"></label>
+        <label>Title<input name="event_title_<%= i %>" value="<%= event.title %>"></label>
+      </div>
+      <label>Text<textarea name="event_text_<%= i %>"><%= event.text %></textarea></label>
+    <% }) %>
+    <h2>Why us</h2>
+    <label>Eyebrow<input name="whyEyebrow" value="<%= home.whyEyebrow %>"></label>
+    <label>Title<input name="whyTitle" value="<%= home.whyTitle %>"></label>
+    <label>Text<textarea name="whyText"><%= home.whyText %></textarea></label>
+    <% home.why.forEach(function (item, i) { %>
+      <label>Card title<input name="why_title_<%= i %>" value="<%= item.title %>"></label>
+      <label>Card text<textarea name="why_text_<%= i %>"><%= item.text %></textarea></label>
+    <% }) %>
+    <h2>Experience</h2>
+    <label>Eyebrow<input name="experienceEyebrow" value="<%= home.experienceEyebrow %>"></label>
+    <label>Title<input name="experienceTitle" value="<%= home.experienceTitle %>"></label>
+    <label>Text<textarea name="experienceText"><%= home.experienceText %></textarea></label>
+    <h2>Regions</h2>
+    <% home.regions.forEach(function (region, i) { %>
+      <div class="grid">
+        <label>Place<input name="region_name_<%= i %>" value="<%= region.name %>"></label>
+        <label>Percent<input name="region_value_<%= i %>" value="<%= region.value %>"></label>
+      </div>
+    <% }) %>
+    <h2>Closing section</h2>
+    <label>Title<input name="ctaTitle" value="<%= home.ctaTitle %>"></label>
+    <label>Text<textarea name="ctaText"><%= home.ctaText %></textarea></label>
+    <label>News title<input name="newsTitle" value="<%= home.newsTitle %>"></label>
+    <label>News text<textarea name="newsText"><%= home.newsText %></textarea></label>
+    <button class="btn gold" type="submit">Save homepage</button>
+  </form>
+</div>

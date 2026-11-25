@@ -1,0 +1,167 @@
+<%- include('partials/header') %>
+<section class="hero" style="background-image:url('<%= home.heroImage %>')">
+  <div class="wrap">
+    <h1 class="reveal" data-from="left"><%= home.heroTitle %></h1>
+    <p class="reveal" data-from="right" style="--d:0.36s"><%= home.heroText %></p>
+    <a class="btn reveal" data-from="up" style="--d:0.96s" href="<%= home.heroLink %>" target="_blank" rel="noopener"><%= home.heroButton %> →</a>
+  </div>
+  <div class="hero-shape" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><path fill="#ffffff" d="M761.9,40.6L643.1,24L333.9,93.8L0.1,1H0v99h1000V1"/></svg>
+  </div>
+</section>
+
+<a class="map-link reveal" data-from="up" href="<%= home.socials.map %>" target="_blank" rel="noopener" aria-label="Open the Mandraginda map">
+  <canvas id="georgia"></canvas>
+</a>
+<script src="/js/map.js"></script>
+
+<section class="stats">
+  <div class="wrap">
+    <% home.stats.forEach(function (stat, index) { %>
+      <div class="stat reveal" data-from="up" style="--d:<%= index * 0.12 %>s">
+        <strong><span data-count="<%= stat.value %>">0</span><%= stat.suffix %></strong>
+        <span class="stat-label"><%= stat.label %></span>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section" id="events">
+  <div class="wrap center">
+    <div class="eyebrow reveal" data-from="up"><%= home.eventsEyebrow %></div>
+    <h2 class="reveal" data-from="up"><%= home.eventsTitle %></h2>
+    <p class="lead reveal" data-from="fade"><%= home.eventsText %></p>
+    <div class="cards">
+      <% home.events.forEach(function (event) { %>
+        <article class="event rise" style="background-image:linear-gradient(transparent, rgba(4,28,50,.2)), url('<%= event.image %>')">
+          <div>
+            <small><%= event.kicker %></small>
+            <h3><%= event.title %></h3>
+            <p><%= event.text %></p>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <div class="wrap">
+    <div class="why-intro">
+      <div class="why-kicker reveal" data-from="down"><%= home.whyEyebrow %></div>
+      <h2 class="reveal" data-from="up"><%= home.whyTitle %></h2>
+      <p class="reveal delay" data-from="fade"><%= home.whyText %></p>
+    </div>
+    <div class="features">
+      <% var whyFrom = ["left", "up", "right"]; %>
+      <% var whyIcons = [
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 3v-9l-4 3z"/></svg>',
+        '<svg viewBox="0 0 640 512" aria-hidden="true"><path d="M544 192h-16L419.22 56.02A64.025 64.025 0 0 0 369.24 32H155.33c-26.17 0-49.7 15.93-59.42 40.23L48 194.26C20.44 201.4 0 226.21 0 256v112c0 8.84 7.16 16 16 16h48c0 53.02 42.98 96 96 96s96-42.98 96-96h128c0 53.02 42.98 96 96 96s96-42.98 96-96h48c8.84 0 16-7.16 16-16v-80c0-53.02-42.98-96-96-96zM160 432c-26.47 0-48-21.53-48-48s21.53-48 48-48 48 21.53 48 48-21.53 48-48 48zm72-240H116.93l38.4-96H232v96zm48 0V96h89.24l76.8 96H280zm200 240c-26.47 0-48-21.53-48-48s21.53-48 48-48 48 21.53 48 48-21.53 48-48 48z"/></svg>',
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm7 0a2.5 2.5 0 1 0-2.5-2.5A2.5 2.5 0 0 0 15.5 11zM2 18.5V17a3.5 3.5 0 0 1 3.5-3.5h4A3.5 3.5 0 0 1 13 17v1.5H2zm11.2 0v-1.2a4.8 4.8 0 0 1 1.6-3.5 3.2 3.2 0 0 1 2.2-.8H20a3 3 0 0 1 3 3v2.5h-9.8z"/></svg>'
+      ]; %>
+      <% home.why.forEach(function (item, index) { %>
+        <article class="feature reveal" data-from="<%= whyFrom[index] || 'up' %>">
+          <%- whyIcons[index] || '' %>
+          <h3><%= item.title %></h3>
+          <p><%= item.text %></p>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div class="reveal" data-from="left">
+      <img src="<%= home.experienceImage %>" alt="">
+      <div class="trip"><b data-count="<%= home.trips %>">0</b><span>+ <%= home.tripsLabel %></span></div>
+    </div>
+    <div>
+      <div class="eyebrow reveal" data-from="right"><%= home.experienceEyebrow %></div>
+      <h2 class="reveal" data-from="up"><%= home.experienceTitle %></h2>
+      <p class="reveal" data-from="fade" style="--d:0.36s"><%= home.experienceText %></p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="regions">
+      <% home.regions.forEach(function (region, index) { %>
+        <div class="region reveal" data-from="up" style="--d:<%= Math.min(index * 0.06, 0.48) %>s">
+          <span><%= region.name %><b><%= region.value %>%</b></span>
+          <div class="bar"><i data-bar="<%= Math.max(region.value, 2) * 8 %>"></i></div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section soft">
+  <div class="wrap center">
+    <div class="eyebrow reveal" data-from="left">Partners</div>
+    <h2 class="reveal" data-from="left">Our partners</h2>
+    <div class="partners">
+      <% home.partners.forEach(function (partner, index) { %>
+        <img class="reveal" data-from="up" style="--d:<%= index * 0.12 %>s" src="<%= partner.src %>" alt="<%= partner.alt %>">
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section dark" style="background-image:url('<%= home.ctaImage %>')">
+  <div class="wrap center">
+    <h2 class="reveal" data-from="up"><%= home.ctaTitle %></h2>
+    <p class="lead reveal" data-from="fade" style="--d:0.36s"><%= home.ctaText %></p>
+    <a class="btn reveal" data-from="up" style="--d:0.55s" href="/contact">Contact us</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="center">
+      <div class="eyebrow reveal" data-from="up">YouTube</div>
+      <h2 class="reveal" data-from="up">Youtube Comments</h2>
+    </div>
+    <div class="comments">
+      <% home.comments.forEach(function (comment, index) { %>
+        <a class="comment reveal" data-from="up" style="--d:<%= index * 0.15 %>s" href="<%= comment.url %>" target="_blank" rel="noopener">
+          <header>
+            <img src="<%= comment.image %>" alt="">
+            <strong><%= comment.name %></strong>
+          </header>
+          <p><%= comment.text %></p>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="gallery-band">
+  <div class="gallery">
+    <% home.gallery.forEach(function (src, index) { %>
+      <img class="reveal" data-from="zoom" style="--d:<%= index * 0.12 %>s" src="<%= src %>" alt="">
+    <% }) %>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="center">
+      <div class="eyebrow reveal" data-from="right"><%= home.newsEyebrow %></div>
+      <h2 class="reveal" data-from="up"><%= home.newsTitle %></h2>
+      <p class="lead reveal" data-from="fade" style="--d:0.36s"><%= home.newsText %></p>
+    </div>
+    <div class="news-grid">
+      <% posts.forEach(function (post, index) { %>
+        <article class="news-card reveal" data-from="up" style="--d:<%= index * 0.18 %>s">
+          <% if (post.image) { %><a href="/<%= post.slug %>"><img src="<%= post.image %>" alt=""></a><% } %>
+          <div>
+            <time><%= post.published_at %></time>
+            <h3><a href="/<%= post.slug %>"><%= post.title %></a></h3>
+            <p><%= post.excerpt %></p>
+            <a class="btn dark" href="/<%= post.slug %>">Read</a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

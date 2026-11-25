@@ -1,0 +1,14 @@
+<div class="panel">
+  <div class="row"><h1>Cars</h1><a class="btn gold" href="/admin/cars/new">Add car</a></div>
+  <table>
+    <tr><th></th><th>Car</th><th>Details</th><th></th></tr>
+    <% cars.forEach(function (car) { %>
+      <tr>
+        <td><% if (car.image) { %><img class="thumb" src="<%= car.image %>" alt=""><% } %></td>
+        <td><strong><%= car.title %></strong><br><%= car.slug %></td>
+        <td><%= car.manufacturer %> <%= car.model %> <%= car.year %></td>
+        <td><a href="/admin/cars/<%= car.id %>">Edit</a></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>

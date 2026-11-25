@@ -1,0 +1,12 @@
+<div class="panel">
+  <div class="row"><h1>Articles</h1><a class="btn gold" href="/admin/posts/new">New article</a></div>
+  <table>
+    <% posts.forEach(function (post) { %>
+      <tr>
+        <td><% if (post.image) { %><img class="thumb" src="<%= post.image %>" alt=""><% } %></td>
+        <td><strong><%= post.title %></strong><br><%= post.published_at %> · <%= post.status %></td>
+        <td><a href="/admin/posts/<%= post.id %>">Edit</a></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>

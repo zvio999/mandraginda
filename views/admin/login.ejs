@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in · Mandraginda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="login">
+    <form method="post" action="/admin/login">
+      <h1>Control panel</h1>
+      <p>Mandraginda</p>
+      <% if (error) { %><div class="error"><%= error %></div><% } %>
+      <label>Username<input name="username" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn gold" type="submit">Log in</button>
+    </form>
+  </div>
+</body>
+</html>

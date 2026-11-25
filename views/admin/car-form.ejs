@@ -1,0 +1,32 @@
+<div class="panel">
+  <h1><%= car.id ? 'Edit car' : 'New car' %></h1>
+  <form method="post" action="<%= car.id ? '/admin/cars/' + car.id : '/admin/cars' %>" enctype="multipart/form-data">
+    <div class="grid">
+      <label>Title<input name="title" value="<%= car.title || '' %>" required></label>
+      <label>Address slug<input name="slug" value="<%= car.slug || '' %>" placeholder="jeep"></label>
+      <label>Manufacturer<input name="manufacturer" value="<%= car.manufacturer || '' %>"></label>
+      <label>Model<input name="model" value="<%= car.model || '' %>"></label>
+      <label>Year<input name="year" value="<%= car.year || '' %>"></label>
+      <label>Engine<input name="engine" value="<%= car.engine || '' %>"></label>
+      <label>Fuel<input name="fuel_type" value="<%= car.fuel_type || '' %>"></label>
+      <label>Tire size<input name="tire_size" value="<%= car.tire_size || '' %>"></label>
+      <label>Tire type<input name="tier_type" value="<%= car.tier_type || '' %>"></label>
+      <label>Status
+        <select name="status">
+          <option value="publish" <%= car.status !== 'draft' ? 'selected' : '' %>>Published</option>
+          <option value="draft" <%= car.status === 'draft' ? 'selected' : '' %>>Hidden</option>
+        </select>
+      </label>
+    </div>
+    <label>Axle lock<input name="axle_lock" value="<%= car.axle_lock || '' %>"></label>
+    <label>Other equipment<input name="others" value="<%= car.others || '' %>"></label>
+    <label>Photo<input type="file" name="image" accept="image/*"></label>
+    <% if (car.image) { %><img class="thumb" src="<%= car.image %>" alt=""><% } %>
+    <button class="btn gold" type="submit">Save</button>
+  </form>
+  <% if (car.id) { %>
+    <form method="post" action="/admin/cars/<%= car.id %>/delete" onsubmit="return confirm('Delete this car?')">
+      <button class="btn quiet" type="submit">Delete car</button>
+    </form>
+  <% } %>
+</div>
