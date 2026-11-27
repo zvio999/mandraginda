@@ -34,6 +34,24 @@ if [ "$LOCK_BEFORE" != "$LOCK_AFTER" ]; then
   fi
 fi
 
-# Cron's ps truncates long command lines, so match the full command instead.
-pkill -f '[s]erver.js' || true
-echo "updated to $(git rev-parse --short HEAD)"
+# ps without -ww hides the script name in cron, so read the full command line.
+STATUS="$WEB/js/update-status.txt"
+{
+  echo "---- $(date) ----"
+  echo "head $(git rev-parse --short HEAD)"
+  command -v pkill || echo "no pkill"
+  ps -ww -u "$(whoami)" -o pid=,args= || true
+} > "$STATUS" 2>&1
+while read -r pid args; do
+  case "$args" in
+    *server.js*|*bin/node*)
+      echo "kill $pid $args" >> "$STATUS"
+      kill -9 "$pid" >> "$STATUS" 2>&1 || echo "kill failed $pid" >> "$STATUS"
+      ;;
+  esac
+done <<EOF
+$(ps -ww -u "$(whoami)" -o pid=,args= 2>/dev/null || true)
+EOF
+pkill -9 -f '[s]erver.js' >> "$STATUS" 2>&1 || echo "pkill exit $?" >> "$STATUS"
+touch "$ROOT/tmp/restart.txt"
+echo "updated to $(git rev-parse --short HEAD)" | tee -a "$STATUS"
