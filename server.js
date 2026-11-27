@@ -567,7 +567,12 @@ app.get("/admin/member-cars", requireAdmin, (req, res) => {
       return ["engine", "fuel", "category", "gearbox", "drive", "doors", "yesno", "yesno"].map(function (group, index) {
         const field = ["engine", "fuel_type", "category", "gearbox", "drive", "doors", "winch", "portal_axle"][index];
         return optionLabel(group, car[field], "en");
-      }).concat([car.tire_size, car.tier_type, car.axle_lock, car.others]).filter(Boolean).join(" · ");
+      }).concat([
+        optionLabel("tireSize", car.tire_size, "en"),
+        optionLabel("tireType", car.tier_type, "en"),
+        optionLabel("axle", car.axle_lock, "en"),
+        car.others,
+      ]).filter(Boolean).join(" · ");
     },
   }, "Member cars");
 });

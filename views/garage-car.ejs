@@ -36,11 +36,11 @@
       </div>
       <div class="form-row">
         <%- include('partials/select', { label: t.portalAxle, name: 'portal_axle', options: carOptions.yesno, selected: car.portal_axle || '', choose: t.choose, required: false }) %>
-        <label><%= t.axleLock %><input name="axle_lock" value="<%= car.axle_lock || '' %>" maxlength="200"></label>
+        <%- include('partials/select', { label: t.axleLock, name: 'axle_lock', options: carOptions.axle, selected: car.axle_lock || '', choose: t.choose, required: false }) %>
       </div>
       <div class="form-row">
-        <label><%= t.tireSize %><input name="tire_size" value="<%= car.tire_size || '' %>" maxlength="200"></label>
-        <label><%= t.tireType %><input name="tier_type" value="<%= car.tier_type || '' %>" maxlength="200"></label>
+        <%- include('partials/select', { label: t.tireSize, name: 'tire_size', options: carOptions.tireSize, selected: car.tire_size || '', choose: t.choose, required: false }) %>
+        <%- include('partials/select', { label: t.tireType, name: 'tier_type', options: carOptions.tireType, selected: car.tier_type || '', choose: t.choose, required: false }) %>
       </div>
       <label><%= t.otherEquipment %><input name="others" value="<%= car.others || '' %>" maxlength="200"></label>
       <label><%= t.photo %><input type="file" name="image" accept="image/*"></label>
