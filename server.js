@@ -87,9 +87,14 @@ app.use((req, res, next) => {
   res.locals.current = req.path;
   res.locals.title = res.locals.t.siteTitle;
   res.locals.member = null;
-  const memberSession = sessions.get(cookieValue(req, "mid"));
-  if (memberSession && memberSession.memberId && db) {
-    res.locals.member = db.prepare("SELECT id, username, email, display_name FROM members WHERE id = ?").get(memberSession.memberId) || null;
+  const mid = cookieValue(req, "mid");
+  if (mid && db) {
+    const memberSession = db.prepare("SELECT member_id, expires_at FROM member_sessions WHERE id = ?").get(mid);
+    if (memberSession && Number(memberSession.expires_at) > Date.now()) {
+      res.locals.member = db.prepare("SELECT id, username, email, display_name FROM members WHERE id = ?").get(memberSession.member_id) || null;
+    } else if (memberSession) {
+      db.prepare("DELETE FROM member_sessions WHERE id = ?").run(mid);
+    }
   }
   next();
 });
@@ -164,10 +169,16 @@ app.post("/contact", (req, res) => {
   res.redirect("/contact?sent=1");
 });
 
+const MEMBER_SESSION_MS = 60 * 60 * 1000;
+
+function memberCookie(id, maxAge) {
+  return "mid=" + id + "; HttpOnly; Path=/; Max-Age=" + maxAge + "; SameSite=Lax";
+}
+
 function setMember(res, memberId) {
   const id = crypto.randomBytes(24).toString("hex");
-  sessions.set(id, { memberId: memberId });
-  res.setHeader("Set-Cookie", "mid=" + id + "; HttpOnly; Path=/; SameSite=Lax");
+  db.prepare("INSERT INTO member_sessions (id, member_id, expires_at) VALUES (?, ?, ?)").run(id, memberId, Date.now() + MEMBER_SESSION_MS);
+  res.setHeader("Set-Cookie", memberCookie(id, 3600));
 }
 
 app.get("/language", (req, res) => {
@@ -233,22 +244,37 @@ function saveMemberCar(req, res) {
   if (!values.title) return renderGarageCar(res, shown, res.locals.t.carNameRequired, 400);
   if (!values.manufacturer || !values.model) return renderGarageCar(res, shown, res.locals.t.carMakeRequired, 400);
   const columns = ["title"].concat(memberCarFields, ["image"]);
-  if (existing) {
-    const update = db.prepare("UPDATE member_cars SET " + columns.map(function (c) { return c + " = ?"; }).join(", ") + " WHERE id = ? AND member_id = ?");
-    update.run.apply(update, columns.map(function (c) { return values[c]; }).concat([existing.id, res.locals.member.id]));
-  } else {
-    const count = db.prepare("SELECT COUNT(*) AS n FROM member_cars WHERE member_id = ?").get(res.locals.member.id).n;
-    if (count >= MAX_MEMBER_CARS) return renderGarageCar(res, values, res.locals.t.carLimit, 400);
-    const insert = db.prepare(
-      "INSERT INTO member_cars (member_id, " + columns.join(", ") + ", created_at) VALUES (?, " + columns.map(function () { return "?"; }).join(", ") + ", ?)"
-    );
-    insert.run.apply(insert, [res.locals.member.id].concat(columns.map(function (c) { return values[c]; }), [new Date().toISOString().slice(0, 16).replace("T", " ")]));
+  try {
+    if (existing) {
+      const update = db.prepare("UPDATE member_cars SET " + columns.map(function (c) { return c + " = ?"; }).join(", ") + " WHERE id = ? AND member_id = ?");
+      update.run.apply(update, columns.map(function (c) { return values[c]; }).concat([existing.id, res.locals.member.id]));
+    } else {
+      const count = db.prepare("SELECT COUNT(*) AS n FROM member_cars WHERE member_id = ?").get(res.locals.member.id).n;
+      if (count >= MAX_MEMBER_CARS) return renderGarageCar(res, values, res.locals.t.carLimit, 400);
+      const insert = db.prepare(
+        "INSERT INTO member_cars (member_id, " + columns.join(", ") + ", created_at) VALUES (?, " + columns.map(function () { return "?"; }).join(", ") + ", ?)"
+      );
+      insert.run.apply(insert, [res.locals.member.id].concat(columns.map(function (c) { return values[c]; }), [new Date().toISOString().slice(0, 16).replace("T", " ")]));
+    }
+  } catch (error) {
+    console.error(error);
+    return renderGarageCar(res, shown, res.locals.t.saveFailed, 500);
   }
   res.redirect("/garage");
 }
 
-app.post("/garage/cars", requireMember, upload.single("image"), saveMemberCar);
-app.post("/garage/cars/:id", requireMember, upload.single("image"), saveMemberCar);
+function uploadCarImage(req, res, next) {
+  upload.single("image")(req, res, function (err) {
+    if (!err) return next();
+    const shown = { title: field(req.body && req.body.title) };
+    memberCarFields.forEach(function (name) { shown[name] = field(req.body && req.body[name]); });
+    const tooBig = err.code === "LIMIT_FILE_SIZE";
+    renderGarageCar(res, shown, tooBig ? res.locals.t.photoTooBig : res.locals.t.photoInvalid, 400);
+  });
+}
+
+app.post("/garage/cars", requireMember, uploadCarImage, saveMemberCar);
+app.post("/garage/cars/:id", requireMember, uploadCarImage, saveMemberCar);
 app.post("/garage/cars/:id/delete", requireMember, (req, res) => {
   db.prepare("DELETE FROM member_cars WHERE id = ? AND member_id = ?").run(Number(req.params.id), res.locals.member.id);
   res.redirect("/garage");
@@ -306,8 +332,8 @@ app.post("/register", (req, res) => {
 
 app.post("/logout", (req, res) => {
   const id = cookieValue(req, "mid");
-  if (id) sessions.delete(id);
-  res.setHeader("Set-Cookie", "mid=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+  if (id) db.prepare("DELETE FROM member_sessions WHERE id = ?").run(id);
+  res.setHeader("Set-Cookie", memberCookie("", 0));
   res.redirect("/");
 });
 
@@ -640,6 +666,12 @@ run()
   .then(async () => {
     require("fs").mkdirSync(uploadDir, { recursive: true });
     db = await open();
+    const stray = db.prepare("SELECT id FROM members WHERE username = ?").get("savecheck");
+    if (stray) {
+      db.prepare("DELETE FROM member_cars WHERE member_id = ?").run(stray.id);
+      db.prepare("DELETE FROM member_sessions WHERE member_id = ?").run(stray.id);
+      db.prepare("DELETE FROM members WHERE id = ?").run(stray.id);
+    }
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
       console.log("Mandraginda is running at http://localhost:" + port);
