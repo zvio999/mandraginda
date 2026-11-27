@@ -1,0 +1,39 @@
+<div class="panel">
+  <div class="row">
+    <h1>3D garage</h1>
+    <span><%= cars.length %></span>
+  </div>
+  <% if (!cars.length) { %>
+    <p>No member has uploaded car photos yet.</p>
+  <% } else { %>
+    <% cars.forEach(function (car) { %>
+      <article class="model-card">
+        <div class="row">
+          <div>
+            <h2><%= car.title %></h2>
+            <p><%= [car.manufacturer, car.model, car.year].filter(Boolean).join(" ") %></p>
+            <p><%= car.display_name || car.username || "Deleted member" %><% if (car.email) { %> · <%= car.email %><% } %></p>
+            <p class="status <%= car.model_status || "none" %>">
+              <%= car.model_status === "ready" ? "Ready" : car.model_status === "pending_3d" ? "Pending 3D" : "No request" %>
+            </p>
+          </div>
+          <div class="model-actions">
+            <% if (car.image || car.photos.length) { %>
+              <a class="btn" href="/admin/garage/<%= car.id %>/photos.zip">Download all photos (ZIP)</a>
+            <% } %>
+            <form method="post" action="/admin/garage/<%= car.id %>/model" enctype="multipart/form-data">
+              <input type="file" name="model" accept=".glb,model/gltf-binary" required>
+              <button class="btn gold" type="submit">Upload GLB</button>
+            </form>
+          </div>
+        </div>
+        <div class="model-thumbs">
+          <% if (car.image) { %><img src="<%= car.image %>" alt=""><% } %>
+          <% car.photos.forEach(function (photo) { %>
+            <img src="<%= photo.path %>" alt="<%= photo.is_wall_poster ? "Wall poster" : "" %>">
+          <% }) %>
+        </div>
+      </article>
+    <% }) %>
+  <% } %>
+</div>

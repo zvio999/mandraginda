@@ -48,6 +48,17 @@ textarea { min-height: 120px; }
 .filters select:disabled { background: var(--soft); color: #8a969c; }
 .filter-actions { display: flex; align-items: center; gap: 12px; grid-column: 1 / -1; }
 .filter-actions .btn { width: auto; }
+.model-card { border-top: 1px solid var(--line); padding: 16px 0; }
+.model-card h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.model-card p { margin: 0 0 4px; }
+.model-actions { display: grid; justify-items: end; gap: 8px; }
+.model-actions form { display: flex; gap: 8px; align-items: center; }
+.model-actions input { width: auto; }
+.model-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.model-thumbs img { width: 92px; height: 64px; object-fit: cover; border-radius: 6px; }
+.status { font-weight: 600; }
+.status.pending_3d { color: #8a5a12; }
+.status.ready { color: #24510f; }
 @media (max-width: 800px) {
   .shell { grid-template-columns: 1fr; }
   .cards, .grid, .filters { grid-template-columns: 1fr; }

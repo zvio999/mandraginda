@@ -5,13 +5,24 @@
   "description": "Mandraginda site and control panel, without WordPress",
   "scripts": {
     "start": "node --no-warnings server.js",
-    "import": "node --no-warnings lib/import.js"
+    "import": "node --no-warnings lib/import.js",
+    "build:garage": "esbuild client/garage/main.jsx --bundle --format=iife --outfile=public/js/garage-3d.js --jsx=automatic --target=es2017 --define:process.env.NODE_ENV=\\\"production\\\" --minify"
   },
   "dependencies": {
+    "archiver": "5.3.2",
     "ejs": "3.1.10",
     "express": "4.21.2",
     "fast-xml-parser": "4.5.1",
     "multer": "1.4.5-lts.2",
     "sql.js": "1.8.0"
+  },
+  "devDependencies": {
+    "@react-three/drei": "9.117.3",
+    "@react-three/fiber": "8.17.14",
+    "@types/three": "0.160.0",
+    "esbuild": "0.24.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "three": "0.160.1"
   }
 }

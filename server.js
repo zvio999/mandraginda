@@ -9,6 +9,7 @@ const { hashPassword, verifyPassword } = require("./lib/auth");
 const { getHome, saveHome } = require("./lib/home");
 const { strings, localizeHome } = require("./lib/i18n");
 const { formOptions, optionLabel } = require("./lib/car-options");
+const garage = require("./lib/garage");
 
 const root = path.join(__dirname);
 const uploadDir = path.join(root, "public", "media", "uploads");
@@ -71,6 +72,7 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(root, "views"));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(root, "public")));
 
 let db;
@@ -276,8 +278,19 @@ function uploadCarImage(req, res, next) {
 app.post("/garage/cars", requireMember, uploadCarImage, saveMemberCar);
 app.post("/garage/cars/:id", requireMember, uploadCarImage, saveMemberCar);
 app.post("/garage/cars/:id/delete", requireMember, (req, res) => {
+  const car = memberCar(req, res);
+  if (car) garage.removeCarAssets(db, car);
   db.prepare("DELETE FROM member_cars WHERE id = ? AND member_id = ?").run(Number(req.params.id), res.locals.member.id);
   res.redirect("/garage");
+});
+
+garage.register(app, {
+  db: function () { return db; },
+  field: field,
+  formOptions: formOptions,
+  requireMember: requireMember,
+  requireAdmin: requireAdmin,
+  renderAdmin: renderAdmin,
 });
 
 app.get("/login", (req, res) => {
@@ -652,6 +665,8 @@ app.get("/admin/member-cars", requireAdmin, (req, res) => {
 });
 
 app.post("/admin/member-cars/:id/delete", requireAdmin, (req, res) => {
+  const car = db.prepare("SELECT * FROM member_cars WHERE id = ?").get(Number(req.params.id));
+  if (car) garage.removeCarAssets(db, car);
   db.prepare("DELETE FROM member_cars WHERE id = ?").run(Number(req.params.id));
   req.session.flash = "Member car deleted.";
   res.redirect(carsRedirect(req.body));

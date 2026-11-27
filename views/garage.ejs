@@ -25,6 +25,7 @@
                   <% } }) %>
                 </dl>
                 <div class="garage-actions">
+                  <a class="btn" href="/garage/cars/<%= car.id %>/studio"><%= t.view3d %></a>
                   <a class="btn" href="/garage/cars/<%= car.id %>"><%= t.edit %></a>
                   <form method="post" action="/garage/cars/<%= car.id %>/delete" onsubmit="return confirm('<%= t.deleteConfirm %>')">
                     <button class="btn quiet" type="submit"><%= t.delete %></button>
