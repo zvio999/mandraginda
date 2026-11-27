@@ -14,6 +14,9 @@ if [ "$LOCAL" = "$REMOTE" ] && [ "$1" != "--force" ]; then
   exit 0
 fi
 
+# Run the restart from a second script so git reset cannot cut it off.
+bash "$ROOT/script/restart.sh" || true
+
 LOCK_BEFORE="$(git rev-parse "HEAD:package-lock.json" 2>/dev/null || true)"
 git reset --hard origin/main
 LOCK_AFTER="$(git rev-parse "HEAD:package-lock.json" 2>/dev/null || true)"
