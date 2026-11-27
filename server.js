@@ -588,30 +588,68 @@ app.post("/admin/messages/:id/delete", requireAdmin, (req, res) => {
 
 app.get("/admin/password", requireAdmin, (req, res) => res.redirect("/admin/user"));
 
+function memberCarDetail(car) {
+  return ["engine", "fuel", "category", "gearbox", "drive", "doors", "yesno", "yesno"].map(function (group, index) {
+    const name = ["engine", "fuel_type", "category", "gearbox", "drive", "doors", "winch", "portal_axle"][index];
+    return optionLabel(group, car[name], "en");
+  }).concat([
+    optionLabel("tireSize", car.tire_size, "en"),
+    optionLabel("tireType", car.tier_type, "en"),
+    optionLabel("axle", car.axle_lock, "en"),
+    car.others,
+  ]).filter(Boolean).join(" · ");
+}
+
+function carFilter(query) {
+  return {
+    user: field(query.user),
+    category: field(query.category),
+    q: field(query.q),
+  };
+}
+
+function memberCarList(filter) {
+  const where = [];
+  const params = [];
+  const owner = Number(filter.user);
+  if (owner) {
+    where.push("c.member_id = ?");
+    params.push(owner);
+  }
+  if (filter.category) {
+    where.push("c.category = ?");
+    params.push(filter.category);
+  }
+  if (filter.q) {
+    const like = "%" + filter.q.replace(/[%_]/g, "") + "%";
+    where.push("(c.title LIKE ? OR c.manufacturer LIKE ? OR c.model LIKE ? OR IFNULL(m.username, '') LIKE ? OR IFNULL(m.display_name, '') LIKE ? OR IFNULL(m.email, '') LIKE ?)");
+    params.push(like, like, like, like, like, like);
+  }
+  const sql = "SELECT c.*, m.username, m.display_name, m.email FROM member_cars c LEFT JOIN members m ON m.id = c.member_id"
+    + (where.length ? " WHERE " + where.join(" AND ") : "")
+    + " ORDER BY c.id DESC";
+  const stmt = db.prepare(sql);
+  return stmt.all.apply(stmt, params);
+}
+
+function carsRedirect(body) {
+  const parts = ["tab=cars"];
+  ["user", "category", "q"].forEach(function (key) {
+    const value = field(body[key]);
+    if (value) parts.push(key + "=" + encodeURIComponent(value));
+  });
+  return "/admin/user?" + parts.join("&");
+}
+
 app.get("/admin/member-cars", requireAdmin, (req, res) => {
-  const cars = db.prepare(
-    "SELECT c.*, m.username, m.display_name, m.email FROM member_cars c LEFT JOIN members m ON m.id = c.member_id ORDER BY c.id DESC"
-  ).all();
-  renderAdmin(req, res, "member-cars", {
-    cars: cars,
-    detail: function (car) {
-      return ["engine", "fuel", "category", "gearbox", "drive", "doors", "yesno", "yesno"].map(function (group, index) {
-        const field = ["engine", "fuel_type", "category", "gearbox", "drive", "doors", "winch", "portal_axle"][index];
-        return optionLabel(group, car[field], "en");
-      }).concat([
-        optionLabel("tireSize", car.tire_size, "en"),
-        optionLabel("tireType", car.tier_type, "en"),
-        optionLabel("axle", car.axle_lock, "en"),
-        car.others,
-      ]).filter(Boolean).join(" · ");
-    },
-  }, "Member cars");
+  const query = req.url.indexOf("?") === -1 ? "" : req.url.slice(req.url.indexOf("?") + 1);
+  res.redirect("/admin/user?tab=cars" + (query ? "&" + query : ""));
 });
 
 app.post("/admin/member-cars/:id/delete", requireAdmin, (req, res) => {
   db.prepare("DELETE FROM member_cars WHERE id = ?").run(Number(req.params.id));
   req.session.flash = "Member car deleted.";
-  res.redirect("/admin/member-cars");
+  res.redirect(carsRedirect(req.body));
 });
 
 function memberList() {
@@ -620,16 +658,33 @@ function memberList() {
   ).all();
 }
 
+function userPage(req, user, error, tab) {
+  const filter = carFilter(req.query || {});
+  const showCars = tab === "cars";
+  return {
+    user: user,
+    members: memberList(),
+    error: error || "",
+    tab: showCars ? "cars" : "users",
+    filter: filter,
+    categories: formOptions("en").category,
+    cars: showCars ? memberCarList(filter) : [],
+    filtered: !!(filter.user || filter.category || filter.q),
+    detail: memberCarDetail,
+  };
+}
+
 app.get("/admin/user", requireAdmin, (req, res) => {
   const user = db.prepare("SELECT id, username FROM users WHERE id = ?").get(req.session.userId);
   if (!user) return res.redirect("/admin/login");
-  renderAdmin(req, res, "user", { user, members: memberList(), error: "" }, "Users");
+  const tab = req.query.tab === "cars" ? "cars" : "users";
+  renderAdmin(req, res, "user", userPage(req, user, "", tab), tab === "cars" ? "Cars" : "Users");
 });
 
 app.post("/admin/user", requireAdmin, (req, res) => {
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.session.userId);
   const username = field(req.body.username);
-  const show = (error) => renderAdmin(req, res, "user", { user: { id: user.id, username: username || user.username }, members: memberList(), error }, "Users");
+  const show = (error) => renderAdmin(req, res, "user", userPage(req, { id: user.id, username: username || user.username }, error, "users"), "Users");
   if (!user || !verifyPassword(String(req.body.current || ""), user.salt, user.password_hash)) {
     return show("Current password is wrong.");
   }

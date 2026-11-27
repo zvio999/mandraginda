@@ -1,32 +1,96 @@
-<div class="panel">
-  <div class="row">
-    <h1>Users</h1>
-    <span><%= members.length %></span>
-  </div>
-  <% if (!members.length) { %>
-    <p>No registered users were found.</p>
-  <% } else { %>
-    <table>
-      <tr><th>Name</th><th>Username</th><th>Email</th><th>Cars</th></tr>
-      <% members.forEach(function (member) { %>
-        <tr>
-          <td><%= member.display_name || member.username %></td>
-          <td><%= member.username %></td>
-          <td><%= member.email %></td>
-          <td><%= member.car_count %></td>
-        </tr>
-      <% }) %>
-    </table>
-  <% } %>
+<div class="tabs">
+  <a class="<%= tab === 'users' ? 'active' : '' %>" href="/admin/user">Users</a>
+  <a class="<%= tab === 'cars' ? 'active' : '' %>" href="/admin/user?tab=cars">Cars</a>
 </div>
 
-<div class="panel" style="margin-top:16px">
-  <h1>Control panel login</h1>
-  <% if (error) { %><p class="error"><%= error %></p><% } %>
-  <form method="post" action="/admin/user">
-    <label>Username<input name="username" value="<%= user.username %>" required></label>
-    <label>Current password<input type="password" name="current" required></label>
-    <label>New password<input type="password" name="next" minlength="8" placeholder="Leave empty to keep the current password"></label>
-    <button class="btn gold" type="submit">Save login</button>
-  </form>
-</div>
+<% if (tab === 'cars') { %>
+  <div class="panel">
+    <div class="row">
+      <h1>Cars</h1>
+      <span><%= cars.length %></span>
+    </div>
+    <form class="filters" method="get" action="/admin/user">
+      <input type="hidden" name="tab" value="cars">
+      <label>User
+        <select name="user">
+          <option value="">All users</option>
+          <% members.forEach(function (member) { %>
+            <option value="<%= member.id %>" <%= String(filter.user) === String(member.id) ? 'selected' : '' %>><%= member.display_name || member.username %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Category
+        <select name="category">
+          <option value="">All categories</option>
+          <% categories.forEach(function (item) { %>
+            <option value="<%= item.value %>" <%= filter.category === item.value ? 'selected' : '' %>><%= item.label %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Search
+        <input name="q" value="<%= filter.q %>" placeholder="Name, make, or model">
+      </label>
+      <div class="filter-actions">
+        <button class="btn" type="submit">Filter</button>
+        <% if (filtered) { %><a href="/admin/user?tab=cars">Clear</a><% } %>
+      </div>
+    </form>
+    <% if (!cars.length) { %>
+      <p><%= filtered ? 'No cars match this filter.' : 'No member has added a car yet.' %></p>
+    <% } else { %>
+      <table>
+        <tr><th>Photo</th><th>Car</th><th>Owner</th><th>Details</th><th>Added</th><th></th></tr>
+        <% cars.forEach(function (car) { %>
+          <tr>
+            <td><% if (car.image) { %><img class="thumb" src="<%= car.image %>" alt="<%= car.title %>"><% } %></td>
+            <td><b><%= car.title %></b><br><%= [car.manufacturer, car.model, car.year].filter(Boolean).join(' ') %></td>
+            <td><%= car.display_name || car.username || 'Deleted member' %><% if (car.email) { %><br><small><%= car.email %></small><% } %></td>
+            <td><small><%= detail(car) %></small></td>
+            <td><%= car.created_at %></td>
+            <td>
+              <form method="post" action="/admin/member-cars/<%= car.id %>/delete" onsubmit="return confirm('Delete this car?')">
+                <input type="hidden" name="user" value="<%= filter.user %>">
+                <input type="hidden" name="category" value="<%= filter.category %>">
+                <input type="hidden" name="q" value="<%= filter.q %>">
+                <button class="btn quiet" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+  </div>
+<% } else { %>
+  <div class="panel">
+    <div class="row">
+      <h1>Users</h1>
+      <span><%= members.length %></span>
+    </div>
+    <% if (!members.length) { %>
+      <p>No registered users were found.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Name</th><th>Username</th><th>Email</th><th>Cars</th></tr>
+        <% members.forEach(function (member) { %>
+          <tr>
+            <td><%= member.display_name || member.username %></td>
+            <td><%= member.username %></td>
+            <td><%= member.email %></td>
+            <td><a href="/admin/user?tab=cars&user=<%= member.id %>"><%= member.car_count %></a></td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <h1>Control panel login</h1>
+    <% if (error) { %><p class="error"><%= error %></p><% } %>
+    <form method="post" action="/admin/user">
+      <label>Username<input name="username" value="<%= user.username %>" required></label>
+      <label>Current password<input type="password" name="current" required></label>
+      <label>New password<input type="password" name="next" minlength="8" placeholder="Leave empty to keep the current password"></label>
+      <button class="btn gold" type="submit">Save login</button>
+    </form>
+  </div>
+<% } %>
