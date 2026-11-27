@@ -5,7 +5,7 @@
     <h1><%= car.id ? t.editCar : t.addCar %></h1>
     <% if (error) { %><p class="error"><%= error %></p><% } %>
     <form class="form" method="post" action="<%= car.id ? '/garage/cars/' + car.id : '/garage/cars' %>" enctype="multipart/form-data">
-      <label><%= t.carName %><input name="title" value="<%= car.title || '' %>" maxlength="120" required placeholder="Toyota Land Cruiser 80"></label>
+      <label><%= t.carName %><input name="title" value="<%= car.title || '' %>" maxlength="120" required placeholder="Jeep Wrangler Rubicon"></label>
       <div class="form-row">
         <label><%= t.manufacturer %>
           <select name="manufacturer" data-makes data-selected="<%= car.manufacturer || '' %>" data-placeholder="<%= t.choose %>" required>
