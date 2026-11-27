@@ -34,5 +34,6 @@ if [ "$LOCK_BEFORE" != "$LOCK_AFTER" ]; then
   fi
 fi
 
-ps -u "$(whoami)" -o pid=,cmd= | grep '[s]erver.js' | awk '{print $1}' | xargs -r kill || true
+# Cron's ps truncates long command lines, so match the full command instead.
+pkill -f '[s]erver.js' || true
 echo "updated to $(git rev-parse --short HEAD)"
