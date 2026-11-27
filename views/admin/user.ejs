@@ -11,7 +11,7 @@
     </div>
     <form class="filters" method="get" action="/admin/user">
       <input type="hidden" name="tab" value="cars">
-      <label>User
+      <label class="wide">User
         <select name="user">
           <option value="">All users</option>
           <% members.forEach(function (member) { %>
@@ -19,22 +19,34 @@
           <% }) %>
         </select>
       </label>
-      <label>Category
-        <select name="category">
-          <option value="">All categories</option>
-          <% categories.forEach(function (item) { %>
-            <option value="<%= item.value %>" <%= filter.category === item.value ? 'selected' : '' %>><%= item.label %></option>
-          <% }) %>
+      <label>Manufacturer
+        <select name="manufacturer" data-makes data-selected="<%= filter.manufacturer %>" data-placeholder="All">
+          <option value="">All</option>
         </select>
       </label>
-      <label>Search
-        <input name="q" value="<%= filter.q %>" placeholder="Name, make, or model">
+      <label>Model
+        <select name="model" data-models data-selected="<%= filter.model %>" data-placeholder="All" <%= filter.manufacturer ? "" : "disabled" %>>
+          <option value="">All</option>
+        </select>
       </label>
+      <%- include('../partials/select', { label: 'Year', name: 'year', options: carOptions.year, selected: filter.year, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Fuel', name: 'fuel_type', options: carOptions.fuel, selected: filter.fuel_type, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Engine', name: 'engine', options: carOptions.engine, selected: filter.engine, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Category', name: 'category', options: carOptions.category, selected: filter.category, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Gearbox', name: 'gearbox', options: carOptions.gearbox, selected: filter.gearbox, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Drive wheels', name: 'drive', options: carOptions.drive, selected: filter.drive, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Number of doors', name: 'doors', options: carOptions.doors, selected: filter.doors, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Winch', name: 'winch', options: carOptions.yesno, selected: filter.winch, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Portal axle', name: 'portal_axle', options: carOptions.yesno, selected: filter.portal_axle, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Axle lock', name: 'axle_lock', options: carOptions.axle, selected: filter.axle_lock, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Tire size', name: 'tire_size', options: carOptions.tireSize, selected: filter.tire_size, choose: 'All', required: false }) %>
+      <%- include('../partials/select', { label: 'Tire type', name: 'tier_type', options: carOptions.tireType, selected: filter.tier_type, choose: 'All', required: false }) %>
       <div class="filter-actions">
         <button class="btn" type="submit">Filter</button>
         <% if (filtered) { %><a href="/admin/user?tab=cars">Clear</a><% } %>
       </div>
     </form>
+    <script src="/js/garage-car.js"></script>
     <% if (!cars.length) { %>
       <p><%= filtered ? 'No cars match this filter.' : 'No member has added a car yet.' %></p>
     <% } else { %>
@@ -50,8 +62,9 @@
             <td>
               <form method="post" action="/admin/member-cars/<%= car.id %>/delete" onsubmit="return confirm('Delete this car?')">
                 <input type="hidden" name="user" value="<%= filter.user %>">
-                <input type="hidden" name="category" value="<%= filter.category %>">
-                <input type="hidden" name="q" value="<%= filter.q %>">
+                <% ["manufacturer", "model", "year", "fuel_type", "engine", "category", "gearbox", "drive", "doors", "winch", "portal_axle", "axle_lock", "tire_size", "tier_type"].forEach(function (key) { %>
+                  <input type="hidden" name="<%= key %>" value="<%= filter[key] %>">
+                <% }) %>
                 <button class="btn quiet" type="submit">Delete</button>
               </form>
             </td>

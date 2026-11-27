@@ -600,12 +600,21 @@ function memberCarDetail(car) {
   ]).filter(Boolean).join(" · ");
 }
 
+const memberCarFilterKeys = ["manufacturer", "model", "year", "fuel_type", "engine", "category", "gearbox", "drive", "doors", "winch", "portal_axle", "axle_lock", "tire_size", "tier_type"];
+
 function carFilter(query) {
-  return {
-    user: field(query.user),
-    category: field(query.category),
-    q: field(query.q),
-  };
+  const filter = { user: field(query.user) };
+  memberCarFilterKeys.forEach(function (key) {
+    filter[key] = field(query[key]);
+  });
+  return filter;
+}
+
+function filterActive(filter) {
+  if (filter.user) return true;
+  return memberCarFilterKeys.some(function (key) {
+    return !!filter[key];
+  });
 }
 
 function memberCarList(filter) {
@@ -616,15 +625,11 @@ function memberCarList(filter) {
     where.push("c.member_id = ?");
     params.push(owner);
   }
-  if (filter.category) {
-    where.push("c.category = ?");
-    params.push(filter.category);
-  }
-  if (filter.q) {
-    const like = "%" + filter.q.replace(/[%_]/g, "") + "%";
-    where.push("(c.title LIKE ? OR c.manufacturer LIKE ? OR c.model LIKE ? OR IFNULL(m.username, '') LIKE ? OR IFNULL(m.display_name, '') LIKE ? OR IFNULL(m.email, '') LIKE ?)");
-    params.push(like, like, like, like, like, like);
-  }
+  memberCarFilterKeys.forEach(function (key) {
+    if (!filter[key]) return;
+    where.push("c." + key + " = ?");
+    params.push(filter[key]);
+  });
   const sql = "SELECT c.*, m.username, m.display_name, m.email FROM member_cars c LEFT JOIN members m ON m.id = c.member_id"
     + (where.length ? " WHERE " + where.join(" AND ") : "")
     + " ORDER BY c.id DESC";
@@ -634,7 +639,7 @@ function memberCarList(filter) {
 
 function carsRedirect(body) {
   const parts = ["tab=cars"];
-  ["user", "category", "q"].forEach(function (key) {
+  ["user"].concat(memberCarFilterKeys).forEach(function (key) {
     const value = field(body[key]);
     if (value) parts.push(key + "=" + encodeURIComponent(value));
   });
@@ -665,9 +670,9 @@ function userPage(req, tab) {
     members: memberList(),
     tab: showCars ? "cars" : "users",
     filter: filter,
-    categories: formOptions("en").category,
+    carOptions: formOptions("en"),
     cars: showCars ? memberCarList(filter) : [],
-    filtered: !!(filter.user || filter.category || filter.q),
+    filtered: filterActive(filter),
     detail: memberCarDetail,
   };
 }
