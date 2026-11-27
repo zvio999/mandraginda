@@ -666,12 +666,6 @@ run()
   .then(async () => {
     require("fs").mkdirSync(uploadDir, { recursive: true });
     db = await open();
-    const stray = db.prepare("SELECT id FROM members WHERE username = ?").get("savecheck");
-    if (stray) {
-      db.prepare("DELETE FROM member_cars WHERE member_id = ?").run(stray.id);
-      db.prepare("DELETE FROM member_sessions WHERE member_id = ?").run(stray.id);
-      db.prepare("DELETE FROM members WHERE id = ?").run(stray.id);
-    }
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
       console.log("Mandraginda is running at http://localhost:" + port);
