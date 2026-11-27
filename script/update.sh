@@ -47,7 +47,7 @@ STATUS="$WEB/js/update-status.txt"
 } > "$STATUS" 2>&1
 while read -r pid args; do
   case "$args" in
-    *server.js*|*bin/node*)
+    *server.js*|*bin/node*|*lsnode:*)
       echo "kill $pid $args" >> "$STATUS"
       kill -9 "$pid" >> "$STATUS" 2>&1 || echo "kill failed $pid" >> "$STATUS"
       ;;
@@ -55,6 +55,7 @@ while read -r pid args; do
 done <<EOF
 $(ps -ww -u "$(whoami)" -o pid=,args= 2>/dev/null || true)
 EOF
-pkill -9 -f '[s]erver.js' >> "$STATUS" 2>&1 || echo "pkill exit $?" >> "$STATUS"
+pkill -9 -f '[s]erver.js' >> "$STATUS" 2>&1 || echo "pkill server exit $?" >> "$STATUS"
+pkill -9 -f '[l]snode:' >> "$STATUS" 2>&1 || echo "pkill lsnode exit $?" >> "$STATUS"
 touch "$ROOT/tmp/restart.txt"
 echo "updated to $(git rev-parse --short HEAD)" | tee -a "$STATUS"
