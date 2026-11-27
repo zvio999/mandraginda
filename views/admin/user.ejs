@@ -1,6 +1,6 @@
 <div class="tabs">
-  <a class="<%= tab === 'users' ? 'active' : '' %>" href="/admin/user">Users</a>
-  <a class="<%= tab === 'cars' ? 'active' : '' %>" href="/admin/user?tab=cars">Cars</a>
+  <a class="btn<%= tab === 'users' ? ' gold' : '' %>" href="/admin/user"<% if (tab === 'users') { %> aria-current="page"<% } %>>Users</a>
+  <a class="btn<%= tab === 'cars' ? ' gold' : '' %>" href="/admin/user?tab=cars"<% if (tab === 'cars') { %> aria-current="page"<% } %>>Cars</a>
 </div>
 
 <% if (tab === 'cars') { %>
