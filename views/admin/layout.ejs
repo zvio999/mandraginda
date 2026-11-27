@@ -18,6 +18,7 @@
       <a href="/admin/pages" class="<%= current.indexOf('/admin/pages') === 0 ? 'active' : '' %>">Pages</a>
       <a href="/admin/messages" class="<%= current === '/admin/messages' ? 'active' : '' %>">Messages<% if (unread) { %> (<%= unread %>)<% } %></a>
       <a href="/" target="_blank">View site</a>
+      <a href="/admin/account" class="<%= current === '/admin/account' ? 'active' : '' %>">Account</a>
       <form method="post" action="/admin/logout"><button class="btn quiet" type="submit" style="color:white;margin:10px 12px">Log out</button></form>
     </aside>
     <div class="main">

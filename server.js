@@ -586,7 +586,7 @@ app.post("/admin/messages/:id/delete", requireAdmin, (req, res) => {
   res.redirect("/admin/messages");
 });
 
-app.get("/admin/password", requireAdmin, (req, res) => res.redirect("/admin/user"));
+app.get("/admin/password", requireAdmin, (req, res) => res.redirect("/admin/account"));
 
 function memberCarDetail(car) {
   return ["engine", "fuel", "category", "gearbox", "drive", "doors", "yesno", "yesno"].map(function (group, index) {
@@ -658,13 +658,11 @@ function memberList() {
   ).all();
 }
 
-function userPage(req, user, error, tab) {
+function userPage(req, tab) {
   const filter = carFilter(req.query || {});
   const showCars = tab === "cars";
   return {
-    user: user,
     members: memberList(),
-    error: error || "",
     tab: showCars ? "cars" : "users",
     filter: filter,
     categories: formOptions("en").category,
@@ -675,17 +673,22 @@ function userPage(req, user, error, tab) {
 }
 
 app.get("/admin/user", requireAdmin, (req, res) => {
-  const user = db.prepare("SELECT id, username FROM users WHERE id = ?").get(req.session.userId);
-  if (!user) return res.redirect("/admin/login");
   const tab = req.query.tab === "cars" ? "cars" : "users";
-  renderAdmin(req, res, "user", userPage(req, user, "", tab), tab === "cars" ? "Cars" : "Users");
+  renderAdmin(req, res, "user", userPage(req, tab), tab === "cars" ? "Cars" : "Users");
 });
 
-app.post("/admin/user", requireAdmin, (req, res) => {
+app.get("/admin/account", requireAdmin, (req, res) => {
+  const user = db.prepare("SELECT id, username FROM users WHERE id = ?").get(req.session.userId);
+  if (!user) return res.redirect("/admin/login");
+  renderAdmin(req, res, "account", { user, error: "" }, "Account");
+});
+
+app.post("/admin/account", requireAdmin, (req, res) => {
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.session.userId);
+  if (!user) return res.redirect("/admin/login");
   const username = field(req.body.username);
-  const show = (error) => renderAdmin(req, res, "user", userPage(req, { id: user.id, username: username || user.username }, error, "users"), "Users");
-  if (!user || !verifyPassword(String(req.body.current || ""), user.salt, user.password_hash)) {
+  const show = (error) => renderAdmin(req, res, "account", { user: { id: user.id, username: username || user.username }, error }, "Account");
+  if (!verifyPassword(String(req.body.current || ""), user.salt, user.password_hash)) {
     return show("Current password is wrong.");
   }
   if (!username) return show("Enter a username.");
@@ -698,8 +701,8 @@ app.post("/admin/user", requireAdmin, (req, res) => {
     const { salt, hash } = hashPassword(next);
     db.prepare("UPDATE users SET password_hash = ?, salt = ? WHERE id = ?").run(hash, salt, user.id);
   }
-  req.session.flash = "User saved.";
-  res.redirect("/admin/user");
+  req.session.flash = "Login saved.";
+  res.redirect("/admin/account");
 });
 
 app.get("/:slug", (req, res, next) => {
