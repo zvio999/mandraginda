@@ -1,0 +1,11 @@
+<label><%= label %>
+  <select name="<%= name %>"<%= required ? " required" : "" %>>
+    <option value=""><%= choose %></option>
+    <% options.forEach(function (item) { %>
+      <option value="<%= item.value %>"<%= String(selected || "") === String(item.value) ? " selected" : "" %>><%= item.label %></option>
+    <% }) %>
+    <% if (selected && !options.some(function (item) { return String(item.value) === String(selected); })) { %>
+      <option value="<%= selected %>" selected><%= selected %></option>
+    <% } %>
+  </select>
+</label>

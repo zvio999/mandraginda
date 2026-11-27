@@ -7,15 +7,35 @@
     <form class="form" method="post" action="<%= car.id ? '/garage/cars/' + car.id : '/garage/cars' %>" enctype="multipart/form-data">
       <label><%= t.carName %><input name="title" value="<%= car.title || '' %>" maxlength="120" required placeholder="Toyota Land Cruiser 80"></label>
       <div class="form-row">
-        <label><%= t.manufacturer %><input name="manufacturer" value="<%= car.manufacturer || '' %>" maxlength="200"></label>
-        <label><%= t.model %><input name="model" value="<%= car.model || '' %>" maxlength="200"></label>
+        <label><%= t.manufacturer %>
+          <select name="manufacturer" data-makes data-selected="<%= car.manufacturer || '' %>" data-placeholder="<%= t.choose %>" required>
+            <option value=""><%= t.choose %></option>
+          </select>
+        </label>
+        <label><%= t.model %>
+          <select name="model" data-models data-selected="<%= car.model || '' %>" data-placeholder="<%= t.choose %>" <%= car.manufacturer ? "" : "disabled" %> required>
+            <option value=""><%= t.choose %></option>
+          </select>
+        </label>
       </div>
       <div class="form-row">
-        <label><%= t.year %><input name="year" inputmode="numeric" value="<%= car.year || '' %>" maxlength="200"></label>
-        <label><%= t.engine %><input name="engine" value="<%= car.engine || '' %>" maxlength="200"></label>
+        <%- include('partials/select', { label: t.year, name: 'year', options: carOptions.year, selected: car.year || '', choose: t.choose, required: false }) %>
+        <%- include('partials/select', { label: t.fuel, name: 'fuel_type', options: carOptions.fuel, selected: car.fuel_type || '', choose: t.choose, required: false }) %>
       </div>
       <div class="form-row">
-        <label><%= t.fuel %><input name="fuel_type" value="<%= car.fuel_type || '' %>" maxlength="200"></label>
+        <%- include('partials/select', { label: t.engine, name: 'engine', options: carOptions.engine, selected: car.engine || '', choose: t.choose, required: false }) %>
+        <%- include('partials/select', { label: t.category, name: 'category', options: carOptions.category, selected: car.category || '', choose: t.choose, required: false }) %>
+      </div>
+      <div class="form-row">
+        <%- include('partials/select', { label: t.gearbox, name: 'gearbox', options: carOptions.gearbox, selected: car.gearbox || '', choose: t.choose, required: false }) %>
+        <%- include('partials/select', { label: t.driveWheels, name: 'drive', options: carOptions.drive, selected: car.drive || '', choose: t.choose, required: false }) %>
+      </div>
+      <div class="form-row">
+        <%- include('partials/select', { label: t.doors, name: 'doors', options: carOptions.doors, selected: car.doors || '', choose: t.choose, required: false }) %>
+        <%- include('partials/select', { label: t.winch, name: 'winch', options: carOptions.yesno, selected: car.winch || '', choose: t.choose, required: false }) %>
+      </div>
+      <div class="form-row">
+        <%- include('partials/select', { label: t.portalAxle, name: 'portal_axle', options: carOptions.yesno, selected: car.portal_axle || '', choose: t.choose, required: false }) %>
         <label><%= t.axleLock %><input name="axle_lock" value="<%= car.axle_lock || '' %>" maxlength="200"></label>
       </div>
       <div class="form-row">
@@ -32,4 +52,5 @@
     </form>
   </div>
 </main>
+<script src="/js/garage-car.js"></script>
 <%- include('partials/footer') %>

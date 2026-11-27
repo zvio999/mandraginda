@@ -26,8 +26,8 @@
                 <h3><%= car.title %></h3>
                 <p><%= [car.manufacturer, car.model, car.year].filter(Boolean).join(' ') %></p>
                 <dl class="specs">
-                  <% [['engine', t.engine], ['fuel_type', t.fuel], ['tire_size', t.tireSize], ['tier_type', t.tireType], ['axle_lock', t.axleLock], ['others', t.other]].forEach(function (spec) { if (car[spec[0]]) { %>
-                    <div><small><%= spec[1] %></small><b><%= car[spec[0]] %></b></div>
+                  <% [['category', t.category, 'category'], ['year', t.year], ['fuel_type', t.fuel, 'fuel'], ['engine', t.engine, 'engine'], ['gearbox', t.gearbox, 'gearbox'], ['drive', t.driveWheels, 'drive'], ['doors', t.doors, 'doors'], ['winch', t.winch, 'yesno'], ['portal_axle', t.portalAxle, 'yesno'], ['axle_lock', t.axleLock], ['tire_size', t.tireSize], ['tier_type', t.tireType], ['others', t.other]].forEach(function (spec) { if (car[spec[0]]) { %>
+                    <div><small><%= spec[1] %></small><b><%= spec[2] ? optionLabel(spec[2], car[spec[0]], lang) : car[spec[0]] %></b></div>
                   <% } }) %>
                 </dl>
                 <div class="garage-actions">

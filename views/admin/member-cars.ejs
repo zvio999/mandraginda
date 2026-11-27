@@ -13,7 +13,7 @@
           <td><% if (car.image) { %><img class="thumb" src="<%= car.image %>" alt="<%= car.title %>"><% } %></td>
           <td><b><%= car.title %></b><br><%= [car.manufacturer, car.model, car.year].filter(Boolean).join(' ') %></td>
           <td><%= car.display_name || car.username || 'Deleted member' %><% if (car.email) { %><br><small><%= car.email %></small><% } %></td>
-          <td><small><%= [car.engine, car.fuel_type, car.tire_size, car.tier_type, car.axle_lock, car.others].filter(Boolean).join(' · ') %></small></td>
+          <td><small><%= detail(car) %></small></td>
           <td><%= car.created_at %></td>
           <td>
             <form method="post" action="/admin/member-cars/<%= car.id %>/delete" onsubmit="return confirm('Delete this car?')">

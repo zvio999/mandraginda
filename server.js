@@ -8,6 +8,7 @@ const { run } = require("./lib/import");
 const { hashPassword, verifyPassword } = require("./lib/auth");
 const { getHome, saveHome } = require("./lib/home");
 const { strings, localizeHome } = require("./lib/i18n");
+const { formOptions, optionLabel } = require("./lib/car-options");
 
 const root = path.join(__dirname);
 const uploadDir = path.join(root, "public", "media", "uploads");
@@ -81,6 +82,7 @@ app.use((req, res, next) => {
   const lang = cookieValue(req, "lang") === "en" ? "en" : "ka";
   res.locals.lang = lang;
   res.locals.t = strings[lang];
+  res.locals.optionLabel = optionLabel;
   res.locals.home = localizeHome(getHome(db), lang);
   res.locals.current = req.path;
   res.locals.title = res.locals.t.siteTitle;
@@ -181,7 +183,7 @@ app.get("/language", (req, res) => {
 });
 
 const MAX_MEMBER_CARS = 20;
-const memberCarFields = ["manufacturer", "model", "year", "engine", "fuel_type", "tire_size", "tier_type", "axle_lock", "others"];
+const memberCarFields = ["manufacturer", "model", "year", "engine", "fuel_type", "category", "gearbox", "drive", "doors", "winch", "portal_axle", "tire_size", "tier_type", "axle_lock", "others"];
 
 function requireMember(req, res, next) {
   if (!res.locals.member) return res.redirect("/login");
@@ -194,6 +196,7 @@ function memberCar(req, res) {
 
 function renderGarageCar(res, car, error, status) {
   res.locals.title = res.locals.t.garageTitle;
+  res.locals.carOptions = formOptions(res.locals.lang);
   res.status(status || 200).render("garage-car", { car: car, error: error || "" });
 }
 
@@ -223,6 +226,7 @@ function saveMemberCar(req, res) {
   Object.keys(existing || {}).forEach(function (key) { shown[key] = existing[key]; });
   Object.keys(values).forEach(function (key) { shown[key] = values[key]; });
   if (!values.title) return renderGarageCar(res, shown, res.locals.t.carNameRequired, 400);
+  if (!values.manufacturer || !values.model) return renderGarageCar(res, shown, res.locals.t.carMakeRequired, 400);
   const columns = ["title"].concat(memberCarFields, ["image"]);
   if (existing) {
     const update = db.prepare("UPDATE member_cars SET " + columns.map(function (c) { return c + " = ?"; }).join(", ") + " WHERE id = ? AND member_id = ?");
@@ -557,7 +561,15 @@ app.get("/admin/member-cars", requireAdmin, (req, res) => {
   const cars = db.prepare(
     "SELECT c.*, m.username, m.display_name, m.email FROM member_cars c LEFT JOIN members m ON m.id = c.member_id ORDER BY c.id DESC"
   ).all();
-  renderAdmin(req, res, "member-cars", { cars: cars }, "Member cars");
+  renderAdmin(req, res, "member-cars", {
+    cars: cars,
+    detail: function (car) {
+      return ["engine", "fuel", "category", "gearbox", "drive", "doors", "yesno", "yesno"].map(function (group, index) {
+        const field = ["engine", "fuel_type", "category", "gearbox", "drive", "doors", "winch", "portal_axle"][index];
+        return optionLabel(group, car[field], "en");
+      }).concat([car.tire_size, car.tier_type, car.axle_lock, car.others]).filter(Boolean).join(" · ");
+    },
+  }, "Member cars");
 });
 
 app.post("/admin/member-cars/:id/delete", requireAdmin, (req, res) => {
