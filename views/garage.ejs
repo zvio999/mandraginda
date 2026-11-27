@@ -1,14 +1,8 @@
 <%- include('partials/header') %>
 <main class="page">
   <div class="wrap">
-    <div class="eyebrow"><%= t.account %></div>
+    <div class="eyebrow"><%= t.garage %></div>
     <h1><%= t.garage %></h1>
-    <div class="account-card">
-      <p><b><%= t.fullName %></b><span><%= member.display_name || member.username %></span></p>
-      <p><b><%= t.username %></b><span><%= member.username %></span></p>
-      <p><b><%= t.email %></b><span><%= member.email %></span></p>
-      <form method="post" action="/logout"><button class="btn" type="submit"><%= t.logout %></button></form>
-    </div>
 
     <section class="garage-cars" aria-labelledby="my-cars">
       <div class="garage-head">

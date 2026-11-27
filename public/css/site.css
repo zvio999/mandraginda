@@ -95,6 +95,7 @@ h1, h2, h3, h4 {
 .header .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 92px; gap: 20px; }
 .logo img { width: 132px; height: auto; }
 .nav { display: flex; align-items: center; gap: 28px; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
 .nav a { color: var(--navy); font-weight: 500; }
 .nav a:hover, .nav a.active { color: var(--gold-2); }
 .nav-btn {
@@ -393,7 +394,7 @@ h1, h2, h3, h4 {
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .btn.quiet { background: var(--soft); color: var(--navy); }
 .btn.quiet:hover { background: var(--line); }
-.garage-cars { margin-top: 56px; }
+.garage-cars { margin-top: 28px; }
 .garage-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
 .garage-head h2 { margin: 0; }
 .garage-head small { color: var(--muted); font-weight: 400; }

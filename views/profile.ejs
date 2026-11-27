@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+<main class="page">
+  <div class="wrap">
+    <div class="eyebrow"><%= t.account %></div>
+    <h1><%= t.profile %></h1>
+    <div class="account-card">
+      <p><b><%= t.fullName %></b><span><%= member.display_name || member.username %></span></p>
+      <p><b><%= t.username %></b><span><%= member.username %></span></p>
+      <p><b><%= t.email %></b><span><%= member.email %></span></p>
+      <form method="post" action="/logout"><button class="btn" type="submit"><%= t.logout %></button></form>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>

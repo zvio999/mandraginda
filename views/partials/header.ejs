@@ -41,7 +41,10 @@
           </div>
         </details>
         <% if (member) { %>
-          <a class="nav-btn gold<%= current === '/garage' ? ' active' : '' %>" href="/garage"><%= t.garage %></a>
+          <span class="nav-actions">
+            <a class="nav-btn gold<%= current.indexOf('/garage') === 0 ? ' active' : '' %>" href="/garage"><%= t.garage %></a>
+            <a class="nav-btn<%= current === '/profile' ? ' active' : '' %>" href="/profile"><%= t.profile %></a>
+          </span>
         <% } else { %>
           <a class="nav-btn<%= current === '/login' ? ' active' : '' %>" href="/login"><%= t.login %></a>
           <a class="nav-btn gold<%= current === '/register' ? ' active' : '' %>" href="/register"><%= t.registration %></a>

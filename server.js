@@ -13,7 +13,7 @@ const { formOptions, optionLabel } = require("./lib/car-options");
 const root = path.join(__dirname);
 const uploadDir = path.join(root, "public", "media", "uploads");
 const sessions = new Map();
-const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout", "language", "garage"]);
+const reserved = new Set(["admin", "cars", "car", "contact", "news", "media", "css", "js", "send-email", "login", "register", "logout", "language", "garage", "profile"]);
 
 const storage = multer.diskStorage({
   destination: uploadDir,
@@ -199,6 +199,11 @@ function renderGarageCar(res, car, error, status) {
   res.locals.carOptions = formOptions(res.locals.lang);
   res.status(status || 200).render("garage-car", { car: car, error: error || "" });
 }
+
+app.get("/profile", requireMember, (req, res) => {
+  res.locals.title = res.locals.t.profileTitle;
+  res.render("profile", { member: res.locals.member });
+});
 
 app.get("/garage", requireMember, (req, res) => {
   const cars = db.prepare("SELECT * FROM member_cars WHERE member_id = ? ORDER BY id DESC").all(res.locals.member.id);
